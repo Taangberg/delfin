@@ -1,3 +1,5 @@
+package User_And_Member;
+
 public class Member extends User{
 String name;
 String lastName;

@@ -8,7 +8,10 @@ public class CsvMapper {
     public fromCsvAdministrator(){
 
     }
-    public fromCsvCompetitions(){
+    public fromCsvCompetitionsU18(){
+
+    }
+    public fromCsvCompetitionsO18(){
 
     }
     public fromCsvMembers(){
@@ -30,7 +33,10 @@ public class CsvMapper {
     public toCsvAdministrator(){
 
     }
-    public toCsvCompetitions(){
+    public toCsvCompetitionsCompetitionsO18(){
+
+    }
+    public toCsvCompetitionsCompetitionsU18(){
 
     }
     public toCsvMembers(){
