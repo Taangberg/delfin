@@ -1,19 +1,28 @@
-public class Member{
+public class Member extends User{
 String name;
 String lastName;
-String email;
 int age;
 int memberNumber;
-Activities activities;
+boolean competitor;
 
-    public Member(String name, String lastName, String email, int age, Activities activities){
+    public Member(String name, String lastName, String email, String password, int age, int memberNumber, boolean competitor){
         this.name = name;
         this.lastName = lastName;
-        this.email = email;
+        super(email, password);
         this.age = age;
         this.memberNumber = memberNumber;
-        this. activities = activities;
+        this.competitor = competitor;
     }
 
+    public int getAge() {
+        return age;
+    }
 
+    public boolean isCompetitor() {
+        return competitor;
+    }
+
+    public String toString() {
+        return name + " " + lastName + " " + email + " " + age + " " + memberNumber + " " + competitor;
+    }
 }
