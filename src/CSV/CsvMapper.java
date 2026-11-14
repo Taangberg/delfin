@@ -1,57 +1,83 @@
 package CSV;
+import Competition.CompetitionResultsO18;
+import Competition.CompetitionResultsU18;
+import User_And_Member.Administrator;
+import User_And_Member.Member;
+import User_And_Member.Trainer;
+import User_And_Member.Treasurer;
 import java.time.LocalDate;
-import java.util.List;
 
 public class CsvMapper {
     String delimiter = ",";
 
-    public fromCsvAdministrator(){
+    public Administrator fromCsvAdministrator(String line){
+        String[] fields = line.split(delimiter, -1);
+        return new Administrator(
+                fields[0],
+                fields[1]
+        );
+    }
+    public CompetitionResultsU18 fromCsvCompetitionsU18(String line){
 
     }
-    public fromCsvCompetitionsU18(){
+    public CompetitionResultsO18 fromCsvCompetitionsO18(String line){
 
     }
-    public fromCsvCompetitionsO18(){
+    public Member fromCsvMembers(String line){
+        String[] fields = line.split(delimiter, -1);
+        return new Member(
+                fields[0],
+                fields[1],
+                fields[2],
+                fields[3],
+                LocalDate.parse(fields[4]),
+                Integer.parseInt(fields[5]),
+                Boolean.parseBoolean(fields[6])
+        );
+    }
+    public Trainer fromCsvTrainers(String line){
+        String[] fields = line.split(delimiter, -1);
+        return new Trainer(
+                fields[0],
+                fields[1]
+        );
+    }
+    public fromCsvU18(String line){
 
     }
-    public fromCsvMembers(){
+    public fromCsvO18(String line){
 
     }
-    public fromCsvTrainers(){
-
-    }
-    public fromCsvU18(){
-
-    }
-    public fromCsvO18(){
-
-    }
-    public fromCsvTreasurers(){
-
+    public Treasurer fromCsvTreasurers(String line){
+        String[] fields = line.split(delimiter, -1);
+        return new Treasurer(
+                fields[0],
+                fields[1]
+        );
     }
 
-    public toCsvAdministrator(){
+    public String toCsvAdministrator(){
 
     }
-    public toCsvCompetitionsCompetitionsO18(){
+    public String toCsvCompetitionsCompetitionsO18(){
 
     }
-    public toCsvCompetitionsCompetitionsU18(){
+    public String toCsvCompetitionsCompetitionsU18(){
 
     }
-    public toCsvMembers(){
+    public String toCsvMembers(){
 
     }
-    public toCsvTrainers(){
+    public String toCsvTrainers(){
 
     }
-    public toCsvU18(){
+    public String toCsvU18(){
 
     }
-    public toCsvO18(){
+    public String toCsvO18(){
 
     }
-    public toCsvTreasurers(){
+    public String toCsvTreasurers(){
 
     }
 }
