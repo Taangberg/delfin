@@ -18,19 +18,34 @@ boolean competitor;
         this.competitor = competitor;
     }
 
-//    public int getAge() {
-//        return age;
-//    }
-//
-//    public boolean isCompetitor() {
-//        return competitor;
-//    }
-//
+    public boolean isCompetitor() {
+        return competitor;
+    }
+    public String getName(){
+        return name;
+    }
+    public String getLastName(){
+        return lastName;
+    }
+    public String getEmail(){
+        return email;
+    }
+    public void setName(String newName){
+        name = newName;
+    }
+    public void setLastName(String newLastName){
+        lastName = newLastName;
+    }
+    public void setEmail(String newEmail){
+        email = newEmail;
+    }
+
+
     public int getMemberNumber(){
         return memberNumber;
     }
-//
-//    public String toString() {
-//        return name + " " + lastName + " " + email + " " + age + " " + memberNumber + " " + competitor;
-//    }
+
+    public String toString() {
+        return name + " " + lastName + " " + email + " " + age + " " + memberNumber + " " + competitor;
+    }
 }

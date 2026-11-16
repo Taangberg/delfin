@@ -1,4 +1,5 @@
 void main() {
-    ConsoleUI UI =  new ConsoleUI();
+    Backend backend = new Backend();
+    ConsoleUI UI =  new ConsoleUI(backend);
     UI.start();
 }

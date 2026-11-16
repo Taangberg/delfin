@@ -1,58 +1,123 @@
 import User_And_Member.*;
 import Activities.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class ConsoleUI {
     private final Activities activities = new Activities();
+    Backend backend;
+
+    public ConsoleUI(Backend backend){
+        this.backend = backend;
+    }
 
     public void start() {
         boolean running = true;
 
         while (running) {
-            showMenu();
+            showStartMenu();
             int choice = Integer.parseInt(IO.readln("Choose a option, to continue "));
             switch (choice) {
-                case 1 -> activities.addMember(createMember());
-                case 2 -> showMembers();
-                case 3 -> running = false;
+                case 1 -> login();
+                case 2 -> running = false;
                 default -> IO.println("Invalid input");
             }
         }
     }
 
-    private void showMenu() {
+    private void showStartMenu() {
         IO.println();
-        IO.println(" 1. | Create member");
-        IO.println(" 2. | Show");
-        IO.println(" 3. | Exit");
+        IO.println(" 1. | Log in");
+        IO.println(" 2. | Exit");
         IO.println();
     }
 
-    private Member createMember() {
-        String firstName = IO.readln("Input first name: ");
-        String lastName = IO.readln("Input last name: ");
+    public void login(){
         String email = IO.readln("Input Email: ");
-        String password = IO.readln("Input new password: ");
-        int age = Integer.parseInt(IO.readln("Input age: "));
-        int memberNumber = Integer.parseInt(IO.readln("Input new member number: "));
-        boolean competitor = IO.readln("Competitor? (yes/no): ").trim().equalsIgnoreCase("yes");
-
-        Member member = new Member(firstName, lastName, email, password, age, memberNumber, competitor);
-        IO.println("Created: " + member);
-        return member;
+        String password = IO.readln("Input Password: ");
+        backend.login(email, password);
     }
 
-    private void showMembers() {
-        showMembersMenu();
-        int choice = Integer.parseInt(IO.readln("Choose a option, to continue "));
-        switch (choice) {
-            case 1 -> showJuniors();
-            case 2 -> showSeniors();
-            case 3 -> showExercisers();
-            case 4 -> showJuniorCompetitors();
-            case 5 -> showSeniorCompetitors();
-            default -> IO.println("Invalid input");
+    public int adminInput(){
+        IO.println("""
+                1. Create new member.
+                2. Edit existing member.
+                3. Remove member.
+                """);
+        return Integer.parseInt(IO.readln("Input..."));
+    }
+
+    public void adminRun(String email, String password){
+        switch(adminInput()){
+            case 1 -> createMember(email, password);
+            case 2 -> editMember();
+            case 3 -> removeMember();
         }
+    }
+
+
+    public void createMember(String email, String password){
+        backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), isCompetitor());
+    }
+
+    public EditMember editMember(){
+        backend.printMembers();
+        int memberNumber = Integer.parseInt(IO.readln("Input membernumber: "));
+        boolean running = true;
+        while (running) {
+            IO.println(String.format("""
+                    1. %s
+                    2. %s
+                    3. %s
+                    4. End
+                    """, backend.printMember(memberNumber).getName(), backend.printMember(memberNumber).getLastName(), backend.printMember(memberNumber).getEmail()));
+            switch (Integer.parseInt(IO.readln("Input "))) {
+                case 1 -> {
+                    return EditMember.FIRSTNAME;
+                }
+                case 2 -> {
+                    return EditMember.LASTNAME;
+                }
+                case 3 -> {
+                    return EditMember.EMAIL;
+                }
+                case 4 -> running = false;
+            }
+            backend.editMember(memberNumber);
+        }
+        return null;
+    }
+
+    public void removeMember(){
+        backend.printMembers();
+        int memberNumber = Integer.parseInt(IO.readln("Input membernumber: "));
+        IO.println("Removed \n" + backend.printMember(memberNumber));
+        backend.removeMember(memberNumber);
+    }
+
+
+    public String firstName(){
+        return IO.readln("Input first name: ");
+    }
+    public String lastName(){
+        return IO.readln("Input last name: ");
+    }
+    public String email(){
+        return IO.readln("Input Email: ");
+    }
+    public String password(){
+        return IO.readln("Input new password: ");
+    }
+    public LocalDate birthday(){
+        return LocalDate.parse(IO.readln("Input birthday: YYYY.MM.DD "));
+    }
+    public boolean isCompetitor() {
+        return IO.readln("Competitor? (yes/no): ").trim().equalsIgnoreCase("yes");
+    }
+
+    public void printMembers(Member member) {
+        IO.println(member);
     }
 
     private void showMembersMenu() {
