@@ -1,7 +1,5 @@
 package User_And_Member;
-
 import Disciplines.*;
-
 import java.time.LocalDate;
 
 public class Trainer extends User {
@@ -14,12 +12,12 @@ public class Trainer extends User {
         return new Result(resultHour, resultMinute, resultSeconds, resultDate, discipline, memberNumber);
     }
 
-    public int selectCompetitor(Member member){
-
-    }
-
-    public int deselectCompetitor(){
-
+    public void changeCompetitorStatus(Member member, Boolean choice){
+        if(choice == true){
+            member.setMemberType(MemberType.COMPETITOR);
+        } else{
+            member.setMemberType(MemberType.EXERCISER);
+        }
     }
 
     /*
