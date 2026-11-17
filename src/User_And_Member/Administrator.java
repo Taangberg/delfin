@@ -30,11 +30,4 @@ public class Administrator extends User {
         }
         return new Member(firstName, lastName, email, password, birthday, memberNumber, competitor);
     }
-
-    public void editMember(int userInput){
-       switch (userInput){
-
-       }
-    }
-
 }

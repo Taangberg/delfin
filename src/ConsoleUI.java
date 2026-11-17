@@ -1,6 +1,5 @@
 import User_And_Member.*;
 import Activities.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
