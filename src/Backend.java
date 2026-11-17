@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members = new ArrayList<>();
@@ -53,7 +52,12 @@ public class Backend {
                 } else if (ui.editMember() == EditMember.EMAIL) {
                     member.setEmail(ui.email());
                 } else if (ui.editMember() == EditMember.MEMBER_TYPE) {
-                    member.setMemberType(ui.memberType());
+                   MemberType newType = ui.memberType();
+                   if(newType == MemberType.COMPETITOR) {
+                       IO.println("User not allowed to edit competitors");
+                       return;
+                   }
+                   member.setMemberType(newType);
                 }
             }
         }
@@ -146,6 +150,7 @@ public class Backend {
             ui.printMembers(seniors);
         }
     }
+
 
     public void printPassive() {
         List<Member> passive = new ArrayList<>();
