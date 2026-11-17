@@ -151,6 +151,7 @@ public class Backend {
         }
     }
 
+
     public void printPassive() {
         List<Member> passive = new ArrayList<>();
 
