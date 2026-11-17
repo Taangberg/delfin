@@ -53,7 +53,12 @@ public class Backend {
                 } else if (ui.editMember() == EditMember.EMAIL) {
                     member.setEmail(ui.email());
                 } else if (ui.editMember() == EditMember.MEMBER_TYPE) {
-                    member.setMemberType(ui.memberType());
+                   MemberType newType = ui.memberType();
+                   if(newType == MemberType.COMPETITOR) {
+                       IO.println("User not allowed to edit competitors");
+                       return;
+                   }
+                   member.setMemberType(newType);
                 }
             }
         }

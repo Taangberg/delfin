@@ -1,5 +1,8 @@
 package Competition;
 
+
+import Disciplines.Result;
+
 public class Competition {
      private String arrangement;
      private String location;
