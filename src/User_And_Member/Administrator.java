@@ -31,11 +31,4 @@ public class Administrator extends User {
         }
         return new Member(firstName, lastName, email, password, birthday, memberNumber, memberType);
     }
-
-    public void editMember(int userInput) {
-        switch (userInput) {
-
-        }
-    }
-
 }
