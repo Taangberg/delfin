@@ -1,4 +1,5 @@
 package Disciplines;
 
-public class Disciplines {
+public enum Disciplines {
+    BACKCRAWL, BREASTSWIMMING, BUTTERFLY, CRAWL
 }
