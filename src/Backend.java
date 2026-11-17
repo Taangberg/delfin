@@ -1,3 +1,5 @@
+import Competition.Competition;
+import Disciplines.Result;
 import User_And_Member.*;
 
 import java.time.LocalDate;
@@ -8,6 +10,8 @@ public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members = new ArrayList<>();
     ConsoleUI ui;
+    List<Competition> competitions = new ArrayList<>();
+
 
     public Backend(List<User> users, List<Member> members) {
         this.users = users;
@@ -164,5 +168,9 @@ public class Backend {
             ui.printMembers(passives);
         }
     }
-}
 
+    public void createCompetition(String arrangement, String location, Result result){
+        Competition competition = new Competition(arrangement, location, result);
+        competitions.add(competition);
+    }
+}
