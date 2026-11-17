@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members = new ArrayList<>();
