@@ -1,10 +1,8 @@
 package CSV;
 import Competition.CompetitionResultsO18;
 import Competition.CompetitionResultsU18;
-import User_And_Member.Administrator;
-import User_And_Member.Member;
-import User_And_Member.Trainer;
-import User_And_Member.Treasurer;
+import User_And_Member.*;
+
 import java.time.LocalDate;
 
 public class CsvMapper {
@@ -32,7 +30,7 @@ public class CsvMapper {
                 fields[3],
                 LocalDate.parse(fields[4]),
                 Integer.parseInt(fields[5]),
-                Boolean.parseBoolean(fields[6])
+                MemberType.valueOf(fields[6])
         );
     }
     public Trainer fromCsvTrainers(String line){
