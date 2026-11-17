@@ -1,51 +1,73 @@
 package User_And_Member;
 
 import java.time.LocalDate;
+import java.time.Period;
 
-public class Member extends User{
-String name;
-String lastName;
-LocalDate birthday;
-int memberNumber;
-boolean competitor;
+public class Member extends User {
+    String name;
+    String lastName;
+    LocalDate birthday;
+    int memberNumber;
+    MemberType memberType;
 
-    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, boolean competitor){
+    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, MemberType memberType) {
         this.name = name;
         this.lastName = lastName;
         super(email, password);
         this.birthday = birthday;
         this.memberNumber = memberNumber;
-        this.competitor = competitor;
+        this.memberType = memberType;
     }
 
-    public boolean isCompetitor() {
-        return competitor;
-    }
-    public String getName(){
+    public String getName() {
         return name;
     }
-    public String getLastName(){
-        return lastName;
-    }
-    public String getEmail(){
-        return email;
-    }
-    public void setName(String newName){
+
+    public void setName(String newName) {
         name = newName;
     }
-    public void setLastName(String newLastName){
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String newLastName) {
         lastName = newLastName;
     }
-    public void setEmail(String newEmail){
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String newEmail) {
         email = newEmail;
     }
 
+    public int getAge() {
+        return Period.between(birthday, LocalDate.now()).getYears();
+    }
 
-    public int getMemberNumber(){
+    public boolean isJunior() {
+        return getAge() < 18;
+    }
+
+    public boolean isOld() {
+        return getAge() >= 60;
+    }
+
+    public int getMemberNumber() {
         return memberNumber;
     }
 
+    public MemberType getMemberType() {
+        return memberType;
+    }
+
+    public void setMemberType(MemberType newMemberType) {
+        memberType = newMemberType;
+    }
+
     public String toString() {
-        return name + " " + lastName + " " + email + " " + age + " " + memberNumber + " " + competitor;
+        return name + " " + lastName + " " + email + " " + birthday + " " + memberNumber + " " + memberType;
     }
 }
