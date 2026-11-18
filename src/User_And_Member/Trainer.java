@@ -14,13 +14,13 @@ public class Trainer extends User {
         return new Result(resultHour, resultMinute, resultSeconds, resultDate, discipline, memberNumber);
     }
 
-    public int selectCompetitor(Member member){
-
-    }
-
-    public int deselectCompetitor(){
-
-    }
+//    public int selectCompetitor(Member member){
+//
+//    }
+//
+//    public int deselectCompetitor(){
+//
+//    }
 
     /*
     Menu punkter;

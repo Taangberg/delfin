@@ -43,6 +43,10 @@ public class Member extends User {
         email = newEmail;
     }
 
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
     public int getAge() {
         return Period.between(birthday, LocalDate.now()).getYears();
     }
