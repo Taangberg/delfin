@@ -31,7 +31,7 @@ public class Backend {
                 }
             } else if (user instanceof Trainer) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-
+                    ui.trainerRun(email, password);
                 }
             } else if (user instanceof Treasurer) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
@@ -79,6 +79,12 @@ public class Backend {
                 members.remove(member);
             }
         }
+    }
+
+
+    public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
+        Trainer trainer = new Trainer(email, password);
+        trainer.changeCompetitorStatus(printMember(memberNumber), choice);
     }
 
     public void printMembers() {
