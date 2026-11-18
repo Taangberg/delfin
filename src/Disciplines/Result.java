@@ -18,4 +18,28 @@ public class Result {
         this.discipline = discipline;
         this.memberNumber = memberNumber;
     }
+
+    public int getResultHours() {
+        return resultHours;
+    }
+
+    public int getResultMinutes() {
+        return resultMinutes;
+    }
+
+    public int getResultSeconds() {
+        return resultSeconds;
+    }
+
+    public LocalDate getResultDate() {
+        return resultDate;
+    }
+
+    public Disciplines getDiscipline() {
+        return discipline;
+    }
+
+    public int getMemberNumber() {
+        return memberNumber;
+    }
 }
