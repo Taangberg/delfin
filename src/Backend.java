@@ -1,3 +1,5 @@
+import Competition.Competition;
+import Disciplines.*;
 import User_And_Member.*;
 
 import java.time.LocalDate;
@@ -42,16 +44,16 @@ public class Backend {
         members.add(member);
     }
 
-    public void editMember(int memberNumber) {
+    public void editMember(int memberNumber, EditMember editChoice) {
         for (Member member : members) {
             if (member.getMemberNumber() == memberNumber) {
-                if (ui.editMember() == EditMember.FIRSTNAME) {
+                if (editChoice == EditMember.FIRSTNAME) {
                     member.setName(ui.firstName());
-                } else if (ui.editMember() == EditMember.LASTNAME) {
+                } else if (editChoice == EditMember.LASTNAME) {
                     member.setLastName(ui.lastName());
-                } else if (ui.editMember() == EditMember.EMAIL) {
+                } else if (editChoice == EditMember.EMAIL) {
                     member.setEmail(ui.email());
-                } else if (ui.editMember() == EditMember.MEMBER_TYPE) {
+                } else if (editChoice == EditMember.MEMBER_TYPE) {
                    MemberType newType = ui.memberType();
                    if(newType == MemberType.COMPETITOR) {
                        IO.println("User not allowed to edit competitors");
@@ -71,6 +73,71 @@ public class Backend {
         }
     }
 
+    public ArrayList<Result> viewTimes(Age chosenAge,int input) {
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (results.isEmpty()) {
+            return null;
+        }
+        for (Result result : results) {
+            switch (chosenAge) {
+                case UNDER_AGE -> {
+                    if (getAge(result.getMemberNumber()) < 18) {
+                        if (result.getDiscipline() == Disciplines.BACKCRAWL) {
+                            backCrawl.add(result);
+                        } else if (result.getDiscipline() == Disciplines.BREASTSWIMMING) {
+                            breastSwimming.add(result);
+                        } else if (result.getDiscipline() == Disciplines.BUTTERFLY) {
+                            butterfly.add(result);
+                        } else if (result.getDiscipline() == Disciplines.CRAWL) {
+                            crawl.add(result);
+                        }
+                    }
+                }
+                case ADULT_AGE -> {
+                    if (getAge(result.getMemberNumber()) >= 18) {
+                        if (result.getDiscipline() == Disciplines.BACKCRAWL) {
+                            backCrawl.add(result);
+                        } else if (result.getDiscipline() == Disciplines.BREASTSWIMMING) {
+                            breastSwimming.add(result);
+                        } else if (result.getDiscipline() == Disciplines.BUTTERFLY) {
+                            butterfly.add(result);
+                        } else if (result.getDiscipline() == Disciplines.CRAWL) {
+                            crawl.add(result);
+                        }
+                    }
+                }
+            }
+            switch (input) {
+                case 1 -> {
+                    return backCrawl;
+                }
+                case 2 -> {
+                    return breastSwimming;
+                }
+                case 3 -> {
+                    return butterfly;
+                }
+                case 4 -> {
+                    return crawl;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Result> viewCompTimes(Age chosenAge, int input){
+        switch (input) {
+            case 1 ->
+            case 2 ->
+            case 3 ->
+            case 4 ->
+        }
+    }
+
 
     public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
         Trainer trainer = new Trainer(email, password);
@@ -79,7 +146,9 @@ public class Backend {
 
     public void printMembers() {
         for (Member member : members) {
-            ui.printMembers(member);
+            if(!members.isEmpty()) {
+                ui.printMembers(member);
+            }
         }
     }
 
@@ -90,6 +159,14 @@ public class Backend {
             }
         }
         return null;
+    }
+
+    public void printCompetitions(){
+        for(Competition competition : competitions){
+            if(!competitions.isEmpty()){
+                ui.printCompetitions(competition);
+            }
+        }
     }
 
     public void printJuniors() {
@@ -169,6 +246,10 @@ public class Backend {
         for(Member passives : passive) {
             ui.printMembers(passives);
         }
+    }
+
+    public int getAge(int memberNumber){
+        return printMember(memberNumber).getAge();
     }
 }
 

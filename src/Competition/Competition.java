@@ -3,14 +3,20 @@ package Competition;
 
 import Disciplines.Result;
 
+import java.util.List;
+
 public class Competition {
      private String arrangement;
      private String location;
-     private Result result;
+     private List<Result> results;
 
-     public Competition(String arrangement, String location, Result result) {
+     public Competition(String arrangement, String location, List<Result> results) {
          this.arrangement = arrangement;
          this.location = location;
-         this.result = result;
+         this.results = results;
+     }
+
+     public List<Result> getResult(){
+         return results;
      }
  }

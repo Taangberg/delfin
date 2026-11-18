@@ -2,7 +2,8 @@ package Disciplines;
 
 import java.time.LocalDate;
 
-public class Result {
+public class
+Result {
     int resultHours;
     int resultMinutes;
     int resultSeconds;
@@ -17,5 +18,13 @@ public class Result {
         this.resultDate = resultDate;
         this.discipline = discipline;
         this.memberNumber = memberNumber;
+    }
+
+    public Disciplines getDiscipline() {
+        return discipline;
+    }
+
+    public int getMemberNumber() {
+        return memberNumber;
     }
 }

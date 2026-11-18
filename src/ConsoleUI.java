@@ -1,7 +1,8 @@
+import Competition.Competition;
+import Disciplines.Disciplines;
 import User_And_Member.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class ConsoleUI {
     Backend backend;
@@ -54,43 +55,16 @@ public class ConsoleUI {
         }
     }
 
-    public int trainermenu(){
+    public int trainermenu() {
         IO.println("""
                 1. View Times
                 2. Update member status
                 """);
         return Integer.parseInt(IO.readln("Input..."));
     }
-    public void whichTimes(){
-        IO.println("""
-                    1. Normal excercises
-                    2. Competition times
-                    """);
-        if(Integer.parseInt(IO.readln("Input...")) == 1){
-            switch(printChooseMemberAgeGroup()){
-                case 1 -> {
-                    backend.showU18Times;
-                }
-                case 2 -> {
-                    backend.showO18Times;
-                }
-                default -> IO.println("Give the right input...");
-            }
-        } else if (Integer.parseInt(IO.readln("Input...")) == 2){
-            switch(printChooseMemberAgeGroup()){
-                case 1 -> {
-                    backend.showU18CompTimes();
-                }
-                case 2 -> {
-                    backend.showO18CompTimes();
-                }
-                default -> IO.println("Give the right input...");
-            }
-        }
-    }
 
-    public void trainerRun(String email, String password){
-        switch(trainermenu()){
+    public void trainerRun(String email, String password) {
+        switch (trainermenu()) {
             case 1 -> {
                 whichTimes();
             }
@@ -103,15 +77,26 @@ public class ConsoleUI {
         }
     }
 
-
+    public void whichTimes() {
+        IO.println("""
+                1. Normal excercises
+                2. Competition times
+                """);
+        if (Integer.parseInt(IO.readln("Input...")) == 1) {
+            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        } else if(Integer.parseInt(IO.readln("Input..."))==2){
+            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        }
+    }
     public void createMember(String email, String password) {
         backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), memberType());
     }
 
-    public EditMember editMember() {
+    public void editMember() {
         backend.printMembers();
         int memberNumber = Integer.parseInt(IO.readln("Input membernumber: "));
         boolean running = true;
+        EditMember editChoice = null;
         while (running) {
             IO.println(String.format("""
                     1. %s
@@ -122,22 +107,21 @@ public class ConsoleUI {
                     """, backend.printMember(memberNumber).getName(), backend.printMember(memberNumber).getLastName(), backend.printMember(memberNumber).getEmail(), backend.printMember(memberNumber).getMemberType()));
             switch (Integer.parseInt(IO.readln("Input "))) {
                 case 1 -> {
-                    return EditMember.FIRSTNAME;
+                    editChoice = EditMember.FIRSTNAME;
                 }
                 case 2 -> {
-                    return EditMember.LASTNAME;
+                    editChoice = EditMember.LASTNAME;
                 }
                 case 3 -> {
-                    return EditMember.EMAIL;
+                    editChoice = EditMember.EMAIL;
                 }
                 case 4 -> {
-                    return EditMember.MEMBER_TYPE;
+                    editChoice = EditMember.MEMBER_TYPE;
                 }
                 case 5 -> running = false;
             }
-            backend.editMember(memberNumber);
+            backend.editMember(memberNumber, editChoice);
         }
-        return null;
     }
 
     public void removeMember() {
@@ -176,11 +160,37 @@ public class ConsoleUI {
         IO.println(member);
     }
 
-    public int printChooseMemberAgeGroup(){
+    public void printCompetitions(Competition competition){
+        IO.println(competition);
+    }
+
+    public void printCompetitionChoice(){
+        IO.println("1. " + backend.printCompetitions());
+    }
+
+    public Age printChooseMemberAgeGroup(){
         IO.println("""
                 1. Under 18.
                 2. Over 18.
                 """);
+        switch(Integer.parseInt(IO.readln("Input..."))){
+            case 1 -> {
+                return Age.UNDER_AGE;
+            }
+            case 2 -> {
+                return Age.ADULT_AGE;
+            }
+        }
+    }
+
+    public int printDiscplines(){
+        IO.println("""
+                1. Backcrawl
+                2. Breast Swimming
+                3. Butterfly
+                4. Crawl
+                """);
+
         return Integer.parseInt(IO.readln("Input..."));
     }
 }
