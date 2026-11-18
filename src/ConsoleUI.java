@@ -58,7 +58,7 @@ public class ConsoleUI {
 
 
     public void createMember(String email, String password){
-        backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), isCompetitor());
+        backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), isCompetitor(), isActiveMember());
     }
 
     public EditMember editMember(){
@@ -115,6 +115,9 @@ public class ConsoleUI {
     public boolean isCompetitor() {
         return IO.readln("Competitor? (yes/no): ").trim().equalsIgnoreCase("yes");
     }
+    public boolean isActiveMember() {
+        return IO.readln("Active member? (yes/no): ").trim().equalsIgnoreCase("yes");
+    }
 
     public void printMembers(Member member) {
         IO.println(member);
@@ -157,6 +160,64 @@ public class ConsoleUI {
         }
         for (Member member : list) {
             IO.println(member);
+        }
+    }
+
+    public int treasurerInput() {
+        IO.println("""
+            --- Treasurer Menu ---
+            1. Show expected income
+            2. Create membership payments
+            3. Show paid income
+            4. Show members with unpaid membership
+            5. Show unpaid income
+            6. Register membership payment
+            7. Exit
+            """);
+
+        return Integer.parseInt(IO.readln("Input: "));
+    }
+
+    public void treasurerRun(){
+        boolean running = true;
+
+        while(running){
+            switch (treasurerInput()){
+                case 1 -> IO.println("Expected income: " + backend.calculateTotalExpectedIncome() + " DKK");
+                case 2 -> {
+                    int year = LocalDate.now().getYear();
+                    backend.createPaymentsForAllMembers(year);
+                    IO.println("Membership payments created for " + year);
+                }
+                case 3 -> {
+                    int year = LocalDate.now().getYear();
+                    IO.println("Paid income " + backend.calculateTotalPaidIncome(year) + " DKK");
+
+                }
+                case 4 -> {
+                    int year = LocalDate.now().getYear();
+                    backend.printMembersWithUnpaidMembership(year);
+                }
+                case 5 -> {
+                    int year = LocalDate.now().getYear();
+                    IO.println("Unpaid income " + backend.calculateTotalUnpaidIncome(year) + "DKK ");
+                }
+                case 6 -> {
+                    int memberNumber = Integer.parseInt(IO.readln("Enter member number: "));
+                    int year = LocalDate.now().getYear();
+
+                    boolean success = backend.registerMembershipPayment(memberNumber, year);
+
+                    if (success){
+                        IO.println("Membership payment successfully registered.");
+                    } else {
+                        IO.println("No membership payment found for this member and year.");
+                    }
+                }
+                case 7 -> running = false;
+                default -> IO.println("Invalid input");
+            }
+
         }
     }
 }

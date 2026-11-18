@@ -10,7 +10,7 @@ public class Administrator extends User {
     }
 
     // Create skal have connection til backend hvilket tilføjer til arrayList og backend har forbindelse til UI, hvilket admin kan skrive i.
-    public Member createNewMember(List<Member> members, String firstName, String lastName, String email, String password, LocalDate birthday, boolean competitor){
+    public Member createNewMember(List<Member> members, String firstName, String lastName, String email, String password, LocalDate birthday, boolean competitor, boolean activeMember){
         Random random = new Random();
         int memberNumber = 0;
         boolean running = true;
@@ -28,7 +28,7 @@ public class Administrator extends User {
                 }
             }
         }
-        return new Member(firstName, lastName, email, password, birthday, memberNumber, competitor);
+        return new Member(firstName, lastName, email, password, birthday, memberNumber, competitor, activeMember);
     }
 
     public void editMember(int userInput){

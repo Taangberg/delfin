@@ -8,14 +8,16 @@ String lastName;
 LocalDate birthday;
 int memberNumber;
 boolean competitor;
+boolean activeMember;
 
-    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, boolean competitor){
+    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, boolean competitor, boolean activeMember){
         this.name = name;
         this.lastName = lastName;
         super(email, password);
         this.birthday = birthday;
         this.memberNumber = memberNumber;
         this.competitor = competitor;
+        this.activeMember = activeMember;
     }
 
     public boolean isCompetitor() {
@@ -45,7 +47,15 @@ boolean competitor;
         return memberNumber;
     }
 
+    public boolean isActiveMember(){
+        return activeMember;
+    }
+
+    public LocalDate getBirthday(){
+        return birthday;
+    }
+
     public String toString() {
-        return name + " " + lastName + " " + email + " " + age + " " + memberNumber + " " + competitor;
+        return name + " " + lastName + " " + email + " " + birthday + " " + memberNumber + " " + competitor + " " + activeMember;
     }
 }
