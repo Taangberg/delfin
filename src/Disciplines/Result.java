@@ -2,7 +2,8 @@ package Disciplines;
 
 import java.time.LocalDate;
 
-public class Result {
+public class
+Result {
     int resultHours;
     int resultMinutes;
     int resultSeconds;
