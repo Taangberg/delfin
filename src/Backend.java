@@ -1,7 +1,10 @@
 import Competition.Competition;
 import Disciplines.*;
+import CSV.CSVMapper;
+import CSV.FileHandler;
 import User_And_Member.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +12,20 @@ import java.util.List;
 public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members = new ArrayList<>();
+    private final FileHandler fileHandler;
+    private final String filePath;
     ConsoleUI ui;
 
-    public Backend(List<User> users, List<Member> members) {
-        this.users = users;
-        this.members = members;
+    public Backend(String filePath) throws IOException {
+        this.filePath = filePath;
+
+        CSVMapper csvMapper = new CSVMapper();
+        this.fileHandler = new FileHandler(csvMapper);
+
+        this.members = fileHandler.loadMembers(filePath);
     }
 
-    public void login(String email, String password) {
+    public void login(String email, String password) throws IOException {
         for (User user : users) {
             if (user instanceof Administrator) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
@@ -38,10 +47,11 @@ public class Backend {
         }
     }
 
-    public void createMember(String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) {
+    public void createMember(String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) throws IOException {
         Administrator administrator = new Administrator(adminEmail, adminPassword);
         Member member = administrator.createNewMember(members, firstName, lastName, email, password, birthday, memberType);
         members.add(member);
+        fileHandler.saveMembers(members, filePath);
     }
 
     public void editMember(int memberNumber, EditMember editChoice) {

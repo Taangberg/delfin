@@ -2,6 +2,8 @@ import Competition.Competition;
 import Disciplines.Disciplines;
 import User_And_Member.*;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.time.LocalDate;
 
 public class ConsoleUI {
@@ -11,7 +13,7 @@ public class ConsoleUI {
         this.backend = backend;
     }
 
-    public void start() {
+    public void start() throws IOException{
         boolean running = true;
 
         while (running) {
@@ -32,7 +34,7 @@ public class ConsoleUI {
         IO.println();
     }
 
-    public void login() {
+    public void login() throws IOException {
         String email = IO.readln("Input Email: ");
         String password = IO.readln("Input Password: ");
         backend.login(email, password);
@@ -47,7 +49,7 @@ public class ConsoleUI {
         return Integer.parseInt(IO.readln("Input..."));
     }
 
-    public void adminRun(String email, String password) {
+    public void adminRun(String email, String password) throws IOException {
         switch (adminInput()) {
             case 1 -> createMember(email, password);
             case 2 -> editMember();
@@ -77,18 +79,8 @@ public class ConsoleUI {
         }
     }
 
-    public void whichTimes() {
-        IO.println("""
-                1. Normal excercises
-                2. Competition times
-                """);
-        if (Integer.parseInt(IO.readln("Input...")) == 1) {
-            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), printDiscplines()));
-        } else if(Integer.parseInt(IO.readln("Input..."))==2){
-            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), printDiscplines()));
-        }
-    }
-    public void createMember(String email, String password) {
+
+    public void createMember(String email, String password) throws IOException {
         backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), memberType());
     }
 
