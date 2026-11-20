@@ -1,4 +1,4 @@
-import Competition.Competition;
+import Competition.*;
 import Disciplines.*;
 import CSV.CSVMapper;
 import CSV.FileHandler;
@@ -11,7 +11,9 @@ import java.util.List;
 
 public class Backend {
     List<User> users = new ArrayList<>();
-    List<Member> members = new ArrayList<>();
+    List<Member> members;
+    List<Result> results = new ArrayList<>();
+    List<Competition> competitions = new ArrayList<>();
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
@@ -21,7 +23,6 @@ public class Backend {
 
         CSVMapper csvMapper = new CSVMapper();
         this.fileHandler = new FileHandler(csvMapper);
-
         this.members = fileHandler.loadMembers(filePath);
     }
 
@@ -96,27 +97,37 @@ public class Backend {
             switch (chosenAge) {
                 case UNDER_AGE -> {
                     if (getAge(result.getMemberNumber()) < 18) {
-                        if (result.getDiscipline() == Disciplines.BACKCRAWL) {
-                            backCrawl.add(result);
-                        } else if (result.getDiscipline() == Disciplines.BREASTSWIMMING) {
-                            breastSwimming.add(result);
-                        } else if (result.getDiscipline() == Disciplines.BUTTERFLY) {
-                            butterfly.add(result);
-                        } else if (result.getDiscipline() == Disciplines.CRAWL) {
-                            crawl.add(result);
+                        switch(result.getDiscipline()){
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
                         }
                     }
                 }
                 case ADULT_AGE -> {
                     if (getAge(result.getMemberNumber()) >= 18) {
-                        if (result.getDiscipline() == Disciplines.BACKCRAWL) {
-                            backCrawl.add(result);
-                        } else if (result.getDiscipline() == Disciplines.BREASTSWIMMING) {
-                            breastSwimming.add(result);
-                        } else if (result.getDiscipline() == Disciplines.BUTTERFLY) {
-                            butterfly.add(result);
-                        } else if (result.getDiscipline() == Disciplines.CRAWL) {
-                            crawl.add(result);
+                        switch(result.getDiscipline()){
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
                         }
                     }
                 }
@@ -140,12 +151,77 @@ public class Backend {
     }
 
     public ArrayList<Result> viewCompTimes(Age chosenAge, int input){
-        switch (input) {
-            case 1 ->
-            case 2 ->
-            case 3 ->
-            case 4 ->
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (competitions.isEmpty()) {
+            return null;
         }
+        for(int i = 0; i < competitions.size() ; i++) {
+            for(Result result : competitions.get(i).getResults()) {
+                switch (chosenAge) {
+                    case UNDER_AGE -> {
+                        if (getAge(result.getMemberNumber()) < 18){
+                            switch(result.getDiscipline()){
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                    case ADULT_AGE -> {
+                        if (getAge(result.getMemberNumber()) >= 18){
+                            switch(result.getDiscipline()){
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        switch (input) {
+            case 1 -> {
+                return backCrawl;
+            }
+            case 2 -> {
+                return breastSwimming;
+            }
+            case 3 -> {
+                return butterfly;
+            }
+            case 4 -> {
+                return crawl;
+            }
+        }
+        return null;
+    }
+
+    public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
+        results.add(result);
     }
 
 
