@@ -8,16 +8,16 @@ public class Trainer extends User {
         super(email, password);
     }
 
-    public Result createResult(int resultHour, int resultMinute, int resultSeconds, LocalDate resultDate, Disciplines discipline, int memberNumber){
-        return new Result(resultHour, resultMinute, resultSeconds, resultDate, discipline, memberNumber);
-    }
-
     public void changeCompetitorStatus(Member member, Boolean choice){
         if(choice == true){
             member.setMemberType(MemberType.COMPETITOR);
         } else{
             member.setMemberType(MemberType.EXERCISER);
         }
+    }
+
+    public Result createResult(Disciplines disciplines, int resultHours, int resultMinutes, int resultSeconds, LocalDate resultDate, int memberNumber){
+        return new Result(resultHours,resultMinutes,resultSeconds,resultDate,disciplines,memberNumber);
     }
 
     /*
