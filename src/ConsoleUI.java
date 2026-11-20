@@ -79,6 +79,18 @@ public class ConsoleUI {
         }
     }
 
+    public void whichTimes() {
+        IO.println("""
+                1. Normal excercises
+                2.Competition times
+                """);
+        if (Integer.parseInt(IO.readln("Input...")) == 1) {
+            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        } else if(Integer.parseInt(IO.readln("Input..."))==2){
+            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        }
+    }
+
 
     public void createMember(String email, String password) throws IOException {
         backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), memberType());
@@ -157,7 +169,7 @@ public class ConsoleUI {
     }
 
     public void printCompetitionChoice(){
-        IO.println("1. " + backend.printCompetitions());
+
     }
 
     public Age printChooseMemberAgeGroup(){
@@ -173,6 +185,7 @@ public class ConsoleUI {
                 return Age.ADULT_AGE;
             }
         }
+        return null;
     }
 
     public int printDiscplines(){
