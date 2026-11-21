@@ -88,6 +88,17 @@ public class MembershipFeeService {
         return unpaidPayments;
     }
 
+    public List<MembershipPayment> getPaidPayments(int year){
+        List<MembershipPayment> paidPayments = new ArrayList<>();
+
+        for (MembershipPayment payment : payments){
+            if (payment.getYear() == year && payment.isPaid()){
+                paidPayments.add(payment);
+            }
+        }
+        return paidPayments;
+    }
+
     public int calculateTotalUnpaidIncome(int year) {
         int total = 0;
 

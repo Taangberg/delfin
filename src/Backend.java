@@ -374,20 +374,42 @@ public class Backend {
     public List<MembershipPayment> getUnpaidPayments(int year) {
         return membershipFeeService.getUnpaidPayments(year);
     }
+    public List<MembershipPayment> getPaidPayments(int year){
+        return membershipFeeService.getPaidPayments(year);
+    }
 
     public boolean registerMembershipPayment(int memberNumber, int year) {
         return membershipFeeService.registerPayment(memberNumber, year);
     }
 
     public void printMembersWithUnpaidMembership(int year) {
-        List<MembershipPayment> unpaidPayments =
-                membershipFeeService.getUnpaidPayments(year);
+        List<MembershipPayment> unpaidPayments = membershipFeeService.getUnpaidPayments(year);
 
         for (MembershipPayment payment : unpaidPayments) {
             Member member = printMember(payment.getMemberNumber());
 
             if (member != null) {
                 ui.printMembers(member);
+                IO.println("Payment year: " + payment.getYear());
+                IO.println("Amount: " + payment.getAmount());
+                IO.println("Status: Unpaid");
+                IO.println("--------------------");
+            }
+        }
+    }
+
+    public void printMembersWithPaidMembership(int year){
+        List<MembershipPayment> paidPayments = membershipFeeService.getPaidPayments(year);
+
+        for (MembershipPayment payment : paidPayments){
+            Member member = printMember(payment.getMemberNumber());
+
+            if (member != null){
+                ui.printMembers(member);
+                IO.println("Payment year: " + payment.getYear());
+                IO.println("Amount: " + payment.getAmount());
+                IO.println("Status: Paid");
+                IO.println("--------------------");
             }
         }
     }
