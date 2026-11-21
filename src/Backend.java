@@ -224,6 +224,22 @@ public class Backend {
         results.add(result);
     }
 
+    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date){
+        Trainer trainer = new Trainer(trainerEmail,trainerPassword);
+        Competition competition = trainer.createCompetition(competitions,arrangement,location,date);
+        competitions.add(competition);
+    }
+
+    public void createCompResult(String trainerEmail, String trainerPassword, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
+        for(Competition competition : competitions){
+            if(competition.getCompetitionID() == competitionID) {
+                competition.getResults().add(result);
+            }
+        }
+    }
+
 
     public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
         Trainer trainer = new Trainer(email, password);
