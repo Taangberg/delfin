@@ -99,6 +99,70 @@ public class ConsoleUI {
         }
     }
 
+    public int treasurerInput() {
+        IO.println("""
+            --- Treasurer Menu ---
+            1. View expected income
+            2. View paid income
+            3. View unpaid income
+            4. View members with unpaid membership
+            5. Register membership payment
+            6. Create payments for all members
+            7. Exit
+            """);
+
+        return Integer.parseInt(IO.readln("Input..."));
+    }
+
+    public void treasurerRun() {
+        boolean running = true;
+
+        while (running) {
+            switch (treasurerInput()) {
+
+                case 1 -> IO.println(
+                        "Expected income: " + backend.calculateTotalExpectedIncome()
+                );
+
+                case 2 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    IO.println("Paid income: " + backend.calculateTotalPaidIncome(year));
+                }
+
+                case 3 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    IO.println("Unpaid income: " + backend.calculateTotalUnpaidIncome(year));
+                }
+
+                case 4 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    backend.printMembersWithUnpaidMembership(year);
+                }
+
+                case 5 -> {
+                    int memberNumber = Integer.parseInt(IO.readln("Input member number: "));
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+
+                    if (backend.registerMembershipPayment(memberNumber, year)) {
+                        IO.println("Payment registered.");
+                    } else {
+                        IO.println("Payment not found.");
+                    }
+                }
+
+                case 6 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    backend.createPaymentsForAllMembers(year);
+                    IO.println("Payments created.");
+                }
+
+                case 7 -> running = false;
+
+                default -> IO.println("Invalid input.");
+            }
+        }
+    }
+
     public void whichTimes() {
         IO.println("""
                 1. Normal excercises

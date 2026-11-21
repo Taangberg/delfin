@@ -17,6 +17,7 @@ public class Backend {
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
+    private final MembershipFeeService membershipFeeService = new MembershipFeeService();
 
     public Backend(String filePath) throws IOException {
         this.filePath = filePath;
@@ -38,7 +39,7 @@ public class Backend {
                 }
             } else if (user instanceof Treasurer) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-
+                    ui.treasurerRun();
                 }
             } else if (user instanceof Member) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
@@ -352,6 +353,43 @@ public class Backend {
 
     public int getAge(int memberNumber){
         return printMember(memberNumber).getAge();
+    }
+
+    public int calculateTotalExpectedIncome() {
+        return membershipFeeService.calculateTotalExpectedIncome(members);
+    }
+
+    public void createPaymentsForAllMembers(int year) {
+        membershipFeeService.createPaymentsForAllMembers(members, year);
+    }
+
+    public int calculateTotalPaidIncome(int year) {
+        return membershipFeeService.calculateTotalPaidIncome(year);
+    }
+
+    public int calculateTotalUnpaidIncome(int year) {
+        return membershipFeeService.calculateTotalUnpaidIncome(year);
+    }
+
+    public List<MembershipPayment> getUnpaidPayments(int year) {
+        return membershipFeeService.getUnpaidPayments(year);
+    }
+
+    public boolean registerMembershipPayment(int memberNumber, int year) {
+        return membershipFeeService.registerPayment(memberNumber, year);
+    }
+
+    public void printMembersWithUnpaidMembership(int year) {
+        List<MembershipPayment> unpaidPayments =
+                membershipFeeService.getUnpaidPayments(year);
+
+        for (MembershipPayment payment : unpaidPayments) {
+            Member member = printMember(payment.getMemberNumber());
+
+            if (member != null) {
+                ui.printMembers(member);
+            }
+        }
     }
 }
 
