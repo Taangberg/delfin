@@ -1,8 +1,6 @@
 import Competition.Competition;
 import Disciplines.Disciplines;
 import User_And_Member.*;
-
-import java.io.IOError;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -62,6 +60,7 @@ public class ConsoleUI {
                 1. View Times
                 2. Update member status
                 3. Create normal Training-time
+                4. Create Competition / Result time
                 """);
         return Integer.parseInt(IO.readln("Input..."));
     }
@@ -77,9 +76,24 @@ public class ConsoleUI {
                 backend.changeCompetitorStatus(email, password, userInput, Boolean.parseBoolean(IO.readln("true/false ")));
             }
             case 3 ->{
-                int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
-                printDiscplines();
-                createResult(email, password, memberNumber);
+                createResult(email, password);
+            }
+            case 4 -> {
+                IO.println("""
+                        1. View existing competitions...
+                        2. Create competition
+                        """);
+                switch(Integer.parseInt(IO.readln("Input... "))){
+                    case 1 -> {
+                        IO.println("To create a new time in a given competition, input the competitionID");
+                        backend.printCompetitions();
+                        createCompResult(email, password);
+                    }
+                    case 2 -> {
+                        backend.createCompetition(email, password, IO.readln("Provide arrangement name: "), IO.readln("Provide location name: "), LocalDate.parse(IO.readln("Provide Date for competition: ")));
+                    }
+                }
+
             }
             default -> IO.println("Give the right input...");
         }
@@ -97,8 +111,17 @@ public class ConsoleUI {
         }
     }
 
-    public void createResult(String email, String password, int memberNumber){
+    public void createResult(String email, String password){
+        int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
+        printDiscplines();
         backend.createResult(email, password, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
+    }
+
+    public void createCompResult(String email, String password){
+        int competitionID = Integer.parseInt(IO.readln("Input..."));
+        int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
+        printDiscplines();
+        backend.createCompResult(email, password, competitionID, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
     }
 
     public void createMember(String email, String password) throws IOException {
