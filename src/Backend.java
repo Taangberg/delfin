@@ -1,5 +1,8 @@
 import CSV.CSVMapper;
 import CSV.FileHandler;
+import Competition.Competition;
+import Disciplines.CompetitionResult;
+import Disciplines.Result;
 import User_And_Member.*;
 
 import java.io.IOException;
@@ -10,6 +13,9 @@ import java.util.List;
 public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members = new ArrayList<>();
+    private List<Result> trainingResults = new ArrayList<>();
+    private List<Competition> juniorCompetitions = new ArrayList<>();
+    private List<Competition> seniorCompetitions = new ArrayList<>();
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
@@ -21,6 +27,9 @@ public class Backend {
         this.fileHandler = new FileHandler(csvMapper);
 
         this.members = fileHandler.loadMembers(filePath);
+        loadUsers();
+        loadTrainingResults();
+        loadCompetitions();
     }
 
     public void login(String email, String password) throws IOException {
@@ -62,12 +71,12 @@ public class Backend {
                 } else if (ui.editMember() == EditMember.EMAIL) {
                     member.setEmail(ui.email());
                 } else if (ui.editMember() == EditMember.MEMBER_TYPE) {
-                   MemberType newType = ui.memberType();
-                   if(newType == MemberType.COMPETITOR) {
-                       IO.println("User not allowed to edit competitors");
-                       return;
-                   }
-                   member.setMemberType(newType);
+                    MemberType newType = ui.memberType();
+                    if (newType == MemberType.COMPETITOR) {
+                        IO.println("User not allowed to edit competitors");
+                        return;
+                    }
+                    member.setMemberType(newType);
                 }
             }
         }
@@ -82,7 +91,7 @@ public class Backend {
     }
 
 
-    public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
+    public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice) {
         Trainer trainer = new Trainer(email, password);
         trainer.changeCompetitorStatus(printMember(memberNumber), choice);
     }
@@ -105,12 +114,12 @@ public class Backend {
     public void printJuniors() {
         List<Member> juniors = new ArrayList<>();
 
-        for(Member member : members) {
-            if(member.isJunior()) {
+        for (Member member : members) {
+            if (member.isJunior()) {
                 juniors.add(member);
             }
         }
-        for(Member junior : juniors) {
+        for (Member junior : juniors) {
             ui.printMembers(junior);
         }
     }
@@ -118,12 +127,12 @@ public class Backend {
     public void printSeniors() {
         List<Member> seniors = new ArrayList<>();
 
-        for(Member member : members) {
-            if(!member.isJunior()) {
+        for (Member member : members) {
+            if (!member.isJunior()) {
                 seniors.add(member);
             }
         }
-        for(Member senior : seniors) {
+        for (Member senior : seniors) {
             ui.printMembers(senior);
         }
     }
@@ -131,8 +140,8 @@ public class Backend {
     public void printExercisers() {
         List<Member> exercisers = new ArrayList<>();
 
-        for(Member member : members) {
-            if(member.getMemberType() == MemberType.EXERCISER) {
+        for (Member member : members) {
+            if (member.getMemberType() == MemberType.EXERCISER) {
                 exercisers.add(member);
             }
         }
@@ -144,12 +153,12 @@ public class Backend {
     public void printCompetitorsU18() {
         List<Member> u18 = new ArrayList<>();
 
-        for(Member member : members) {
-            if(member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
+        for (Member member : members) {
+            if (member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
                 u18.add(member);
             }
         }
-        for(Member juniors : u18) {
+        for (Member juniors : u18) {
             ui.printMembers(juniors);
         }
     }
@@ -157,12 +166,12 @@ public class Backend {
     public void printCompetitorsO18() {
         List<Member> o18 = new ArrayList<>();
 
-        for(Member member : members) {
-            if(!member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
+        for (Member member : members) {
+            if (!member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
                 o18.add(member);
             }
         }
-        for(Member seniors : o18) {
+        for (Member seniors : o18) {
             ui.printMembers(seniors);
         }
     }
@@ -171,14 +180,101 @@ public class Backend {
     public void printPassive() {
         List<Member> passive = new ArrayList<>();
 
-        for(Member member : members) {
-            if(member.getMemberType() == MemberType.PASSIVE) {
+        for (Member member : members) {
+            if (member.getMemberType() == MemberType.PASSIVE) {
                 passive.add(member);
             }
         }
-        for(Member passives : passive) {
+        for (Member passives : passive) {
             ui.printMembers(passives);
         }
+    }
+
+    public boolean isJuniorResult(Result result) {
+        Member member = printMember(result.getMemberNumber());
+        if (member == null) {
+            throw new IllegalArgumentException("Member not found");
+        }
+        return member.isJuniorAtDate(result.getResultDate());
+    }
+
+    public List<Result> getJuniorResults(List<Result> results) {
+        List<Result> juniorResults = new ArrayList<>();
+        for (Result result : results) {
+            if (isJuniorResult(result)) {
+                juniorResults.add(result);
+            }
+        }
+        return juniorResults;
+    }
+
+    public List<Result> getSeniorResults(List<Result> results) {
+        List<Result> seniorResults = new ArrayList<>();
+        for (Result result : results) {
+            if (!isJuniorResult(result)) {
+                seniorResults.add(result);
+            }
+        }
+        return seniorResults;
+    }
+
+    public List<CompetitionResult> getJuniorCompetitionResults(List<CompetitionResult> competitionResults) {
+        List<CompetitionResult> juniorResults = new ArrayList<>();
+        for (CompetitionResult competitionResult : competitionResults) {
+            if (isJuniorResult(competitionResult.result())) {
+                juniorResults.add(competitionResult);
+            }
+        }
+        return juniorResults;
+    }
+
+    public List<CompetitionResult> getSeniorCompetitionResults(List<CompetitionResult> competitionResults) {
+        List<CompetitionResult> seniorResults = new ArrayList<>();
+        for (CompetitionResult competitionResult : competitionResults) {
+            if (!isJuniorResult(competitionResult.result())) {
+                seniorResults.add(competitionResult);
+            }
+        }
+        return seniorResults;
+    }
+
+    public void saveTrainingResults(List<Result> results) throws IOException {
+        List<Result> juniorResults = getJuniorResults(results);
+        List<Result> seniorResults = getSeniorResults(results);
+
+        fileHandler.saveResults(juniorResults, "src/CSV/TrainingResults_U18.CSV");
+        fileHandler.saveResults(seniorResults, "src/CSV/TrainingResults_O18.CSV");
+    }
+
+    public void saveCompetitionResults(List<CompetitionResult> competitionResults) throws IOException {
+        List<CompetitionResult> juniorResults = getJuniorCompetitionResults(competitionResults);
+        List<CompetitionResult> seniorResults = getSeniorCompetitionResults(competitionResults);
+
+        fileHandler.saveCompetitionResults(juniorResults, "src/CSV/CompetitionResults_U18.CSV");
+        fileHandler.saveCompetitionResults(seniorResults, "src/CSV/CompetitionResults_O18.CSV");
+    }
+
+    public void loadUsers() throws IOException {
+        users.addAll(fileHandler.loadAdministrator("src/CSV/Administrator.CSV"));
+
+        users.addAll(fileHandler.loadTrainers("src/CSV/Trainers.CSV"));
+
+        users.addAll(fileHandler.loadTreasurers("src/CSV/Treasurers.CSV"));
+
+        users.addAll(members);
+    }
+
+    public void loadTrainingResults() throws IOException {
+        List<Result> juniorResults = fileHandler.loadResults("src/CSV/TrainingResults_U18.CSV");
+        List<Result> seniorResults = fileHandler.loadResults("src/CSV/TrainingResults_O18.CSV");
+
+        trainingResults.addAll(juniorResults);
+        trainingResults.addAll(seniorResults);
+    }
+
+    public void loadCompetitions() throws IOException {
+        juniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_U18.CSV", "src/CSV/CompetitionResults_U18.CSV");
+        seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
     }
 }
 

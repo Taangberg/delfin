@@ -1,6 +1,7 @@
 package CSV;
 
 import Competition.Competition;
+import Disciplines.CompetitionResult;
 import Disciplines.Result;
 import User_And_Member.Administrator;
 import User_And_Member.Member;
@@ -141,5 +142,47 @@ public class FileHandler {
                 writer.newLine();
             }
         }
+    }
+
+    public List<CompetitionResult> loadCompetitionResults(String filePath) throws IOException {
+        List<CompetitionResult> competitionResults = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                competitionResults.add(csvMapper.fromCSVCompetitionResult(line));
+            }
+        }
+        return competitionResults;
+    }
+
+    public void saveCompetitionResults(List<CompetitionResult> competitionResults, String filePath) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(filePath))) {
+            for (CompetitionResult competitionResult : competitionResults) {
+                writer.write(csvMapper.toCSVCompetitionResult(competitionResult));
+                writer.newLine();
+            }
+        }
+    }
+
+    public void connectCompetitionResults(List<Competition> competitions, List<CompetitionResult> competitionResults) {
+        for (CompetitionResult competitionResult : competitionResults) {
+            for(Competition competition : competitions) {
+                if (competition.getCompetitionID() == competitionResult.competitionID()) {
+                    competition.addResult(competitionResult.result());
+                    break; // stopper kun den inderste loop, så derfor den kan forsætte med at tilføje resultater
+                }
+            }
+        }
+    }
+
+    public List<Competition> loadCompetitionsWithResults(String competitionsPath, String resultsPath) throws IOException {
+
+        List<Competition> competitions = loadCompetitions(competitionsPath);
+
+        List<CompetitionResult> competitionResults = loadCompetitionResults(resultsPath);
+
+        connectCompetitionResults(competitions, competitionResults);
+
+        return competitions;
     }
 }
