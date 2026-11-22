@@ -45,4 +45,13 @@ public class Competition {
     public List<Result> getResults() {
         return results;
     }
+
+    public String toString(){
+        return String.format("""
+                Competition: %s
+                ID:
+                Location:
+                Date:
+                """, arrangement, competitionID, location, date);
+    }
 }

@@ -19,13 +19,13 @@ public class Backend {
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
+    private final MembershipFeeService membershipFeeService = new MembershipFeeService();
 
     public Backend(String filePath) throws IOException {
         this.filePath = filePath;
 
         CSVMapper csvMapper = new CSVMapper();
         this.fileHandler = new FileHandler(csvMapper);
-
         this.members = fileHandler.loadMembers(filePath);
         loadUsers();
         loadTrainingResults();
@@ -44,13 +44,13 @@ public class Backend {
                 }
             } else if (user instanceof Treasurer) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-
+                    ui.treasurerRun();
                 }
             } else if (user instanceof Member) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-
+                    ui.memberRun(email);
                 }
-            }
+        }
         }
     }
 
@@ -61,22 +61,22 @@ public class Backend {
         fileHandler.saveMembers(members, filePath);
     }
 
-    public void editMember(int memberNumber) {
+    public void editMember(int memberNumber, EditMember editChoice) {
         for (Member member : members) {
             if (member.getMemberNumber() == memberNumber) {
-                if (ui.editMember() == EditMember.FIRSTNAME) {
+                if (editChoice == EditMember.FIRSTNAME) {
                     member.setName(ui.firstName());
-                } else if (ui.editMember() == EditMember.LASTNAME) {
+                } else if (editChoice == EditMember.LASTNAME) {
                     member.setLastName(ui.lastName());
-                } else if (ui.editMember() == EditMember.EMAIL) {
+                } else if (editChoice == EditMember.EMAIL) {
                     member.setEmail(ui.email());
-                } else if (ui.editMember() == EditMember.MEMBER_TYPE) {
-                    MemberType newType = ui.memberType();
-                    if (newType == MemberType.COMPETITOR) {
-                        IO.println("User not allowed to edit competitors");
-                        return;
-                    }
-                    member.setMemberType(newType);
+                } else if (editChoice == EditMember.MEMBER_TYPE) {
+                   MemberType newType = ui.memberType();
+                   if(newType == MemberType.COMPETITOR) {
+                       IO.println("User not allowed to edit competitors");
+                       return;
+                   }
+                   member.setMemberType(newType);
                 }
             }
         }
@@ -90,6 +90,237 @@ public class Backend {
         }
     }
 
+    public ArrayList<Result> viewTimes(Age chosenAge,int input) {
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (results.isEmpty()) {
+            return null;
+        }
+        for (Result result : results) {
+            switch (chosenAge) {
+                case UNDER_AGE -> {
+                    if (getAge(result.getMemberNumber()) < 18) {
+                        switch(result.getDiscipline()){
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
+                        }
+                    }
+                }
+                case ADULT_AGE -> {
+                    if (getAge(result.getMemberNumber()) >= 18) {
+                        switch(result.getDiscipline()){
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
+                        }
+                    }
+                }
+            }
+            switch (input) {
+                case 1 -> {
+                    return backCrawl;
+                }
+                case 2 -> {
+                    return breastSwimming;
+                }
+                case 3 -> {
+                    return butterfly;
+                }
+                case 4 -> {
+                    return crawl;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Result> viewCompTimes(Age chosenAge, int input){
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (competitions.isEmpty()) {
+            return null;
+        }
+        for(int i = 0; i < competitions.size() ; i++) {
+            for(Result result : competitions.get(i).getResults()) {
+                switch (chosenAge) {
+                    case UNDER_AGE -> {
+                        if (getAge(result.getMemberNumber()) < 18){
+                            switch(result.getDiscipline()){
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                    case ADULT_AGE -> {
+                        if (getAge(result.getMemberNumber()) >= 18){
+                            switch(result.getDiscipline()){
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        switch (input) {
+            case 1 -> {
+                return backCrawl;
+            }
+            case 2 -> {
+                return breastSwimming;
+            }
+            case 3 -> {
+                return butterfly;
+            }
+            case 4 -> {
+                return crawl;
+            }
+        }
+        return null;
+    }
+
+    public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
+        results.add(result);
+    }
+
+    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date){
+        Trainer trainer = new Trainer(trainerEmail,trainerPassword);
+        Competition competition = trainer.createCompetition(competitions,arrangement,location,date);
+        competitions.add(competition);
+    }
+
+    public void createCompResult(String trainerEmail, String trainerPassword, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
+        for(Competition competition : competitions){
+            if(competition.getCompetitionID() == competitionID) {
+                competition.getResults().add(result);
+            }
+        }
+    }
+
+    public ArrayList<Result> viewMembertimes(int choice, int input, String email) {
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (results.isEmpty() || competitions.isEmpty()) {
+            return null;
+        }
+
+        int memberNumber = getMembernumberByEmail(email);
+
+        switch (choice) {
+            case 1 -> {
+                for (Result result : results) {
+                    if (memberNumber == result.getMemberNumber()) {
+                        switch (result.getDiscipline()) {
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
+                        }
+                    }
+                }
+            }
+            case 2 -> {
+                for (int i = 0; i < competitions.size(); i++) {
+                    for (Result result : competitions.get(i).getResults()) {
+                        if (memberNumber == result.getMemberNumber()) {
+                            switch (result.getDiscipline()) {
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                switch (input) {
+                    case 1 -> {
+                        return backCrawl;
+                    }
+                    case 2 -> {
+                        return breastSwimming;
+                    }
+                    case 3 -> {
+                        return butterfly;
+                    }
+                    case 4 -> {
+                        return crawl;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice) {
         Trainer trainer = new Trainer(email, password);
@@ -98,7 +329,9 @@ public class Backend {
 
     public void printMembers() {
         for (Member member : members) {
-            ui.printMembers(member);
+            if(!members.isEmpty()) {
+                ui.printMembers(member);
+            }
         }
     }
 
@@ -109,6 +342,14 @@ public class Backend {
             }
         }
         return null;
+    }
+
+    public void printCompetitions(){
+        for(Competition competition : competitions){
+            if(!competitions.isEmpty()){
+                ui.printCompetitions(competition);
+            }
+        }
     }
 
     public void printJuniors() {
@@ -275,6 +516,78 @@ public class Backend {
     public void loadCompetitions() throws IOException {
         juniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_U18.CSV", "src/CSV/CompetitionResults_U18.CSV");
         seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
+    }
+
+    public int getMembernumberByEmail(String email){
+        for(Member member : members){
+            if(member.getEmail().equalsIgnoreCase(email)){
+                return member.getMemberNumber();
+            }
+        }
+        return 0;
+    }
+
+    public int getAge(int memberNumber){
+        return printMember(memberNumber).getAge();
+    }
+
+    public int calculateTotalExpectedIncome() {
+        return membershipFeeService.calculateTotalExpectedIncome(members);
+    }
+
+    public void createPaymentsForAllMembers(int year) {
+        membershipFeeService.createPaymentsForAllMembers(members, year);
+    }
+
+    public int calculateTotalPaidIncome(int year) {
+        return membershipFeeService.calculateTotalPaidIncome(year);
+    }
+
+    public int calculateTotalUnpaidIncome(int year) {
+        return membershipFeeService.calculateTotalUnpaidIncome(year);
+    }
+
+    public List<MembershipPayment> getUnpaidPayments(int year) {
+        return membershipFeeService.getUnpaidPayments(year);
+    }
+    public List<MembershipPayment> getPaidPayments(int year){
+        return membershipFeeService.getPaidPayments(year);
+    }
+
+    public boolean registerMembershipPayment(int memberNumber, int year) {
+        return membershipFeeService.registerPayment(memberNumber, year);
+    }
+
+    public void printMembersWithUnpaidMembership(int year) {
+        List<MembershipPayment> unpaidPayments = membershipFeeService.getUnpaidPayments(year);
+
+        for (MembershipPayment payment : unpaidPayments) {
+            Member member = printMember(payment.getMemberNumber());
+
+            if (member != null) {
+                ui.printMembers(member);
+                IO.println("Payment year: " + payment.getYear());
+                IO.println("Amount: " + payment.getAmount());
+                IO.println("Status: Unpaid");
+                IO.println("--------------------");
+            }
+        }
+    }
+
+    public void printMembersWithPaidMembership(int year){
+        List<MembershipPayment> paidPayments = membershipFeeService.getPaidPayments(year);
+
+        for (MembershipPayment payment : paidPayments){
+            Member member = printMember(payment.getMemberNumber());
+
+            if (member != null){
+                ui.printMembers(member);
+                IO.println("Payment year: " + payment.getYear());
+                IO.println("Amount: " + payment.getAmount());
+                IO.println("Status: Paid");
+                IO.println("--------------------");
+            }
+        }
     }
 }
 

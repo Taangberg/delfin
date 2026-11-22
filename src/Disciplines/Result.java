@@ -2,7 +2,8 @@ package Disciplines;
 
 import java.time.LocalDate;
 
-public class Result {
+public class
+Result {
     int resultHours;
     int resultMinutes;
     int resultSeconds;
@@ -41,5 +42,14 @@ public class Result {
 
     public int getMemberNumber() {
         return memberNumber;
+    }
+
+    public String toString(){
+        return String.format("""
+                Discpline: %s
+                Time done in: [%n:%n:%n]
+                Date: %s
+                Membernumber: %n
+                """, discipline, resultHours, resultMinutes, resultSeconds, resultDate, memberNumber);
     }
 }

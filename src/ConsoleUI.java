@@ -1,9 +1,8 @@
+import Competition.Competition;
+import Disciplines.Disciplines;
 import User_And_Member.*;
-
-import java.io.IOError;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 public class ConsoleUI {
     Backend backend;
@@ -56,43 +55,18 @@ public class ConsoleUI {
         }
     }
 
-    public int trainermenu(){
+    public int trainermenu() {
         IO.println("""
                 1. View Times
                 2. Update member status
+                3. Create normal Training-time
+                4. Create Competition / Result time
                 """);
         return Integer.parseInt(IO.readln("Input..."));
     }
-    public void whichTimes(){
-        IO.println("""
-                    1. Normal excercises
-                    2. Competition times
-                    """);
-        if(Integer.parseInt(IO.readln("Input...")) == 1){
-            switch(printChooseMemberAgeGroup()){
-                case 1 -> {
-                    backend.showU18Times;
-                }
-                case 2 -> {
-                    backend.showO18Times;
-                }
-                default -> IO.println("Give the right input...");
-            }
-        } else if (Integer.parseInt(IO.readln("Input...")) == 2){
-            switch(printChooseMemberAgeGroup()){
-                case 1 -> {
-                    backend.showU18CompTimes();
-                }
-                case 2 -> {
-                    backend.showO18CompTimes();
-                }
-                default -> IO.println("Give the right input...");
-            }
-        }
-    }
 
-    public void trainerRun(String email, String password){
-        switch(trainermenu()){
+    public void trainerRun(String email, String password) {
+        switch (trainermenu()) {
             case 1 -> {
                 whichTimes();
             }
@@ -101,19 +75,147 @@ public class ConsoleUI {
                 IO.println("Write true or false, to select or deselect competitor status");
                 backend.changeCompetitorStatus(email, password, userInput, Boolean.parseBoolean(IO.readln("true/false ")));
             }
+            case 3 ->{
+                createResult(email, password);
+            }
+            case 4 -> {
+                IO.println("""
+                        1. View existing competitions...
+                        2. Create competition
+                        """);
+                switch(Integer.parseInt(IO.readln("Input... "))){
+                    case 1 -> {
+                        IO.println("To create a new time in a given competition, input the competitionID");
+                        backend.printCompetitions();
+                        createCompResult(email, password);
+                    }
+                    case 2 -> {
+                        backend.createCompetition(email, password, IO.readln("Provide arrangement name: "), IO.readln("Provide location name: "), LocalDate.parse(IO.readln("Provide Date for competition: ")));
+                    }
+                }
+
+            }
             default -> IO.println("Give the right input...");
         }
     }
 
+    public int treasurerInput() {
+        IO.println("""
+            --- Treasurer Menu ---
+            1. View expected income
+            2. View paid income
+            3. View unpaid income
+            4. View members with unpaid membership
+            5. Register membership payment
+            6. Create payments for all members
+            7. View members with paid membership
+            8. Exit
+            """);
 
-    public void createMember(String email, String password) throws IOException {
-        backend.createMember(email, password, firstName(), lastName(), email(), password(), birthday(), memberType());
+        return Integer.parseInt(IO.readln("Input..."));
     }
 
-    public EditMember editMember() {
+    public void treasurerRun() {
+        boolean running = true;
+        while (running) {
+            switch (treasurerInput()) {
+                case 1 -> IO.println(
+                        "Expected income: " + backend.calculateTotalExpectedIncome()
+                );
+                case 2 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    IO.println("Paid income: " + backend.calculateTotalPaidIncome(year));
+                }
+                case 3 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    IO.println("Unpaid income: " + backend.calculateTotalUnpaidIncome(year));
+                }
+                case 4 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    backend.printMembersWithUnpaidMembership(year);
+                }
+                case 5 -> {
+                    int memberNumber = Integer.parseInt(IO.readln("Input member number: "));
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    if (backend.registerMembershipPayment(memberNumber, year)) {
+                        IO.println("Payment registered.");
+                    } else {
+                        IO.println("Payment not found.");
+                    }
+                }
+                case 6 -> {
+                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    backend.createPaymentsForAllMembers(year);
+                    IO.println("Payments created.");
+                }
+                case 7 -> {
+                    int year = Integer.parseInt(IO.readln("Input year"));
+                    backend.printMembersWithPaidMembership(year);
+                }
+                case 8 -> running = false;
+                default -> IO.println("Invalid input.");
+            }
+        }
+    }
+
+    public int memberMenu(){
+        IO.println("""
+                1. View Results
+                2. Pay Fee
+                """);
+        return Integer.parseInt(IO.readln("Input... "));
+    }
+
+    public void memberRun(String email){
+        switch(memberMenu()){
+            case 1 ->{
+
+            }
+            case 2 ->{
+                IO.println("""
+                        1. Training times
+                        2. Competition times
+                        """);
+                int choice = Integer.parseInt(IO.readln("Input..."));
+                IO.println(backend.viewMembertimes(choice, printDiscplines(), email));
+            }
+        }
+    }
+
+    public void whichTimes() {
+        IO.println("""
+                1. Normal excercises
+                2.Competition times
+                """);
+        if (Integer.parseInt(IO.readln("Input...")) == 1) {
+            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        } else if(Integer.parseInt(IO.readln("Input..."))==2){
+            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), printDiscplines()));
+        }
+    }
+
+    public void createResult(String email, String password){
+        int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
+        printDiscplines();
+        backend.createResult(email, password, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
+    }
+
+    public void createCompResult(String email, String password){
+        int competitionID = Integer.parseInt(IO.readln("Input..."));
+        int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
+        printDiscplines();
+        backend.createCompResult(email, password, competitionID, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
+    }
+
+    public void createMember(String email, String password) throws IOException {
+        backend.createMember(email, password, firstName(), lastName(), email(), password(), LocalDate.parse(IO.readln("Input birthday: YYYY.MM.DD ")), memberType());
+    }
+
+    public void editMember() {
         backend.printMembers();
         int memberNumber = Integer.parseInt(IO.readln("Input membernumber: "));
         boolean running = true;
+        EditMember editChoice = null;
         while (running) {
             IO.println(String.format("""
                     1. %s
@@ -124,22 +226,21 @@ public class ConsoleUI {
                     """, backend.printMember(memberNumber).getName(), backend.printMember(memberNumber).getLastName(), backend.printMember(memberNumber).getEmail(), backend.printMember(memberNumber).getMemberType()));
             switch (Integer.parseInt(IO.readln("Input "))) {
                 case 1 -> {
-                    return EditMember.FIRSTNAME;
+                    editChoice = EditMember.FIRSTNAME;
                 }
                 case 2 -> {
-                    return EditMember.LASTNAME;
+                    editChoice = EditMember.LASTNAME;
                 }
                 case 3 -> {
-                    return EditMember.EMAIL;
+                    editChoice = EditMember.EMAIL;
                 }
                 case 4 -> {
-                    return EditMember.MEMBER_TYPE;
+                    editChoice = EditMember.MEMBER_TYPE;
                 }
                 case 5 -> running = false;
             }
-            backend.editMember(memberNumber);
+            backend.editMember(memberNumber, editChoice);
         }
-        return null;
     }
 
     public void removeMember() {
@@ -166,23 +267,79 @@ public class ConsoleUI {
         return IO.readln("Input new password: ");
     }
 
-    public LocalDate birthday() {
-        return LocalDate.parse(IO.readln("Input birthday: YYYY.MM.DD "));
-    }
-
     public MemberType memberType() {
         return MemberType.valueOf(IO.readln("Input member type (EXERCISER/COMPETITOR/PASSIVE): ").trim().toUpperCase());
+    }
+
+    public int inputTimes(int i){
+        switch(i){
+            case 1 -> {
+                return Integer.parseInt(IO.readln("Input amount of hours: "));
+            }
+            case 2 -> {
+                return Integer.parseInt(IO.readln("Input amount of minutes: "));
+            }
+            case 3 -> {
+                return Integer.parseInt(IO.readln("Input amount of seconds: "));
+            }
+        }
+        return 0;
+    }
+
+    public LocalDate createResultDate(){
+        return LocalDate.parse(IO.readln("Input Result Date in format (year,month,day): "));
     }
 
     public void printMembers(Member member) {
         IO.println(member);
     }
 
-    public int printChooseMemberAgeGroup(){
+    public void printCompetitions(Competition competition){
+        IO.println(competition);
+    }
+
+    public Age printChooseMemberAgeGroup(){
         IO.println("""
                 1. Under 18.
                 2. Over 18.
                 """);
+        switch(Integer.parseInt(IO.readln("Input..."))){
+            case 1 -> {
+                return Age.UNDER_AGE;
+            }
+            case 2 -> {
+                return Age.ADULT_AGE;
+            }
+        }
+        return null;
+    }
+
+    public int printDiscplines(){
+        IO.println("""
+                1. Backcrawl
+                2. Breast Swimming
+                3. Butterfly
+                4. Crawl
+                """);
+
         return Integer.parseInt(IO.readln("Input..."));
+    }
+
+    public Disciplines chooseDisciplines(){
+        switch (printDiscplines()){
+            case 1 -> {
+                return Disciplines.BACKCRAWL;
+            }
+            case 2 -> {
+                return Disciplines.BREASTSWIMMING;
+            }
+            case 3 -> {
+                return Disciplines.BUTTERFLY;
+            }
+            case 4 -> {
+                return Disciplines.CRAWL;
+            }
+        }
+        return null;
     }
 }
