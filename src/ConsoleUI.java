@@ -166,19 +166,18 @@ public class ConsoleUI {
         return Integer.parseInt(IO.readln("Input... "));
     }
 
-    public void memberRun(String email){
+    public void memberRun(Member member, String email){
         switch(memberMenu()){
             case 1 ->{
-
-            }
-            case 2 ->{
                 IO.println("""
                         1. Training times
                         2. Competition times
                         """);
                 int choice = Integer.parseInt(IO.readln("Input..."));
                 IO.println(backend.viewMembertimes(choice, printDiscplines(), email));
+
             }
+            case 2 -> payMembershipFee(member);
         }
     }
 
@@ -342,4 +341,47 @@ public class ConsoleUI {
         }
         return null;
     }
+
+    public void printMembershipReceipt(Member member, int year){
+        MembershipPayment payment = backend.getMembershipPayment(member.getMemberNumber(), year);
+
+        if (payment != null && payment.isPaid()){
+            IO.println("""
+                --- Membership Receipt ---
+                Name: %s %s
+                Member number: %d
+                Year: %d
+                Amount: %d kr.
+                --------------------------
+                """.formatted(
+                    member.getName(),
+                    member.getLastName(),
+                    member.getMemberNumber(),
+                    payment.getYear(),
+                    payment.getAmount()
+            ));
+        }
+    }
+
+    public void payMembershipFee(Member member){
+        int year = LocalDate.now().getYear();
+        int amount = backend.calculateMembershipFee(member);
+
+        IO.println("Your membership fee is: " + amount + " kr.");
+        String confirmation = IO.readln("Do you want to pay? (yes/no)");
+
+        if (confirmation.equalsIgnoreCase("Yes")){
+            boolean paid = backend.payMembershipFee(member, year);
+
+            if (paid) {
+                IO.println("Payment successfull");
+                printMembershipReceipt(member, year);
+            } else {
+                IO.println("Membership fee has already been paid.");
+            }
+        } else {
+            IO.println("Payment cancelled.");
+        }
+    }
+
 }
