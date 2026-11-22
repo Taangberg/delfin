@@ -42,11 +42,4 @@ public class Trainer extends User {
         }
         return null;
     }
-
-    /*
-    To muligheder;
-    Komme ind på menuen:
-    *Vælge en created competition og tilføje en tid
-    *Create new competition
-     */
 }
