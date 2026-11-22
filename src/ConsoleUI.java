@@ -158,6 +158,30 @@ public class ConsoleUI {
         }
     }
 
+    public int memberMenu(){
+        IO.println("""
+                1. View Results
+                2. Pay Fee
+                """);
+        return Integer.parseInt(IO.readln("Input... "));
+    }
+
+    public void memberRun(String email){
+        switch(memberMenu()){
+            case 1 ->{
+
+            }
+            case 2 ->{
+                IO.println("""
+                        1. Training times
+                        2. Competition times
+                        """);
+                int choice = Integer.parseInt(IO.readln("Input..."));
+                IO.println(backend.viewMembertimes(choice, printDiscplines(), email));
+            }
+        }
+    }
+
     public void whichTimes() {
         IO.println("""
                 1. Normal excercises

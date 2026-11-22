@@ -43,9 +43,9 @@ public class Backend {
                 }
             } else if (user instanceof Member) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-
+                    ui.memberRun(email);
                 }
-            }
+        }
         }
     }
 
@@ -241,6 +241,81 @@ public class Backend {
         }
     }
 
+    public ArrayList<Result> viewMembertimes(int choice, int input, String email) {
+        ArrayList<Result> backCrawl = new ArrayList<>();
+        ArrayList<Result> breastSwimming = new ArrayList<>();
+        ArrayList<Result> butterfly = new ArrayList<>();
+        ArrayList<Result> crawl = new ArrayList<>();
+
+        if (results.isEmpty() || competitions.isEmpty()) {
+            return null;
+        }
+
+        int memberNumber = getMembernumberByEmail(email);
+
+        switch (choice) {
+            case 1 -> {
+                for (Result result : results) {
+                    if (memberNumber == result.getMemberNumber()) {
+                        switch (result.getDiscipline()) {
+                            case BACKCRAWL -> {
+                                backCrawl.add(result);
+                            }
+                            case BREASTSWIMMING -> {
+                                breastSwimming.add(result);
+                            }
+                            case BUTTERFLY -> {
+                                butterfly.add(result);
+                            }
+                            case CRAWL -> {
+                                crawl.add(result);
+                            }
+                        }
+                    }
+                }
+            }
+            case 2 -> {
+                for (int i = 0; i < competitions.size(); i++) {
+                    for (Result result : competitions.get(i).getResults()) {
+                        if (memberNumber == result.getMemberNumber()) {
+                            switch (result.getDiscipline()) {
+                                case BACKCRAWL -> {
+                                    backCrawl.add(result);
+                                }
+                                case BREASTSWIMMING -> {
+                                    breastSwimming.add(result);
+                                }
+                                case BUTTERFLY -> {
+                                    butterfly.add(result);
+                                }
+                                case CRAWL -> {
+                                    crawl.add(result);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                switch (input) {
+                    case 1 -> {
+                        return backCrawl;
+                    }
+                    case 2 -> {
+                        return breastSwimming;
+                    }
+                    case 3 -> {
+                        return butterfly;
+                    }
+                    case 4 -> {
+                        return crawl;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
         Trainer trainer = new Trainer(email, password);
@@ -349,6 +424,15 @@ public class Backend {
         for(Member passives : passive) {
             ui.printMembers(passives);
         }
+    }
+
+    public int getMembernumberByEmail(String email){
+        for(Member member : members){
+            if(member.getEmail().equalsIgnoreCase(email)){
+                return member.getMemberNumber();
+            }
+        }
+        return 0;
     }
 
     public int getAge(int memberNumber){
