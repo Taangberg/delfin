@@ -2,6 +2,7 @@ import CSV.CSVMapper;
 import CSV.FileHandler;
 import Competition.Competition;
 import Disciplines.CompetitionResult;
+import Disciplines.Disciplines;
 import Disciplines.Result;
 import User_And_Member.*;
 
@@ -50,7 +51,7 @@ public class Backend {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
                     ui.memberRun(email);
                 }
-        }
+            }
         }
     }
 
@@ -71,12 +72,12 @@ public class Backend {
                 } else if (editChoice == EditMember.EMAIL) {
                     member.setEmail(ui.email());
                 } else if (editChoice == EditMember.MEMBER_TYPE) {
-                   MemberType newType = ui.memberType();
-                   if(newType == MemberType.COMPETITOR) {
-                       IO.println("User not allowed to edit competitors");
-                       return;
-                   }
-                   member.setMemberType(newType);
+                    MemberType newType = ui.memberType();
+                    if (newType == MemberType.COMPETITOR) {
+                        IO.println("User not allowed to edit competitors");
+                        return;
+                    }
+                    member.setMemberType(newType);
                 }
             }
         }
@@ -90,7 +91,7 @@ public class Backend {
         }
     }
 
-    public ArrayList<Result> viewTimes(Age chosenAge,int input) {
+    public ArrayList<Result> viewTimes(Age chosenAge, int input) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -103,7 +104,7 @@ public class Backend {
             switch (chosenAge) {
                 case UNDER_AGE -> {
                     if (getAge(result.getMemberNumber()) < 18) {
-                        switch(result.getDiscipline()){
+                        switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
                                 backCrawl.add(result);
                             }
@@ -121,7 +122,7 @@ public class Backend {
                 }
                 case ADULT_AGE -> {
                     if (getAge(result.getMemberNumber()) >= 18) {
-                        switch(result.getDiscipline()){
+                        switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
                                 backCrawl.add(result);
                             }
@@ -156,7 +157,7 @@ public class Backend {
         return null;
     }
 
-    public ArrayList<Result> viewCompTimes(Age chosenAge, int input){
+    public ArrayList<Result> viewCompTimes(Age chosenAge, int input) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -165,12 +166,12 @@ public class Backend {
         if (competitions.isEmpty()) {
             return null;
         }
-        for(int i = 0; i < competitions.size() ; i++) {
-            for(Result result : competitions.get(i).getResults()) {
+        for (int i = 0; i < competitions.size(); i++) {
+            for (Result result : competitions.get(i).getResults()) {
                 switch (chosenAge) {
                     case UNDER_AGE -> {
-                        if (getAge(result.getMemberNumber()) < 18){
-                            switch(result.getDiscipline()){
+                        if (getAge(result.getMemberNumber()) < 18) {
+                            switch (result.getDiscipline()) {
                                 case BACKCRAWL -> {
                                     backCrawl.add(result);
                                 }
@@ -187,8 +188,8 @@ public class Backend {
                         }
                     }
                     case ADULT_AGE -> {
-                        if (getAge(result.getMemberNumber()) >= 18){
-                            switch(result.getDiscipline()){
+                        if (getAge(result.getMemberNumber()) >= 18) {
+                            switch (result.getDiscipline()) {
                                 case BACKCRAWL -> {
                                     backCrawl.add(result);
                                 }
@@ -224,23 +225,23 @@ public class Backend {
         return null;
     }
 
-    public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+    public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber) {
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         results.add(result);
     }
 
-    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date){
-        Trainer trainer = new Trainer(trainerEmail,trainerPassword);
-        Competition competition = trainer.createCompetition(competitions,arrangement,location,date);
+    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date) {
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Competition competition = trainer.createCompetition(competitions, arrangement, location, date);
         competitions.add(competition);
     }
 
-    public void createCompResult(String trainerEmail, String trainerPassword, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+    public void createCompResult(String trainerEmail, String trainerPassword, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber) {
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
-        for(Competition competition : competitions){
-            if(competition.getCompetitionID() == competitionID) {
+        for (Competition competition : competitions) {
+            if (competition.getCompetitionID() == competitionID) {
                 competition.getResults().add(result);
             }
         }
@@ -329,7 +330,7 @@ public class Backend {
 
     public void printMembers() {
         for (Member member : members) {
-            if(!members.isEmpty()) {
+            if (!members.isEmpty()) {
                 ui.printMembers(member);
             }
         }
@@ -344,9 +345,9 @@ public class Backend {
         return null;
     }
 
-    public void printCompetitions(){
-        for(Competition competition : competitions){
-            if(!competitions.isEmpty()){
+    public void printCompetitions() {
+        for (Competition competition : competitions) {
+            if (!competitions.isEmpty()) {
                 ui.printCompetitions(competition);
             }
         }
@@ -518,16 +519,16 @@ public class Backend {
         seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
     }
 
-    public int getMembernumberByEmail(String email){
-        for(Member member : members){
-            if(member.getEmail().equalsIgnoreCase(email)){
+    public int getMembernumberByEmail(String email) {
+        for (Member member : members) {
+            if (member.getEmail().equalsIgnoreCase(email)) {
                 return member.getMemberNumber();
             }
         }
         return 0;
     }
 
-    public int getAge(int memberNumber){
+    public int getAge(int memberNumber) {
         return printMember(memberNumber).getAge();
     }
 
@@ -550,7 +551,8 @@ public class Backend {
     public List<MembershipPayment> getUnpaidPayments(int year) {
         return membershipFeeService.getUnpaidPayments(year);
     }
-    public List<MembershipPayment> getPaidPayments(int year){
+
+    public List<MembershipPayment> getPaidPayments(int year) {
         return membershipFeeService.getPaidPayments(year);
     }
 
@@ -574,13 +576,13 @@ public class Backend {
         }
     }
 
-    public void printMembersWithPaidMembership(int year){
+    public void printMembersWithPaidMembership(int year) {
         List<MembershipPayment> paidPayments = membershipFeeService.getPaidPayments(year);
 
-        for (MembershipPayment payment : paidPayments){
+        for (MembershipPayment payment : paidPayments) {
             Member member = printMember(payment.getMemberNumber());
 
-            if (member != null){
+            if (member != null) {
                 ui.printMembers(member);
                 IO.println("Payment year: " + payment.getYear());
                 IO.println("Amount: " + payment.getAmount());
