@@ -13,10 +13,9 @@ import java.util.List;
 
 public class Backend {
     List<User> users = new ArrayList<>();
-    List<Member> members = new ArrayList<>();
-    private List<Result> trainingResults = new ArrayList<>();
-    private List<Competition> juniorCompetitions = new ArrayList<>();
-    private List<Competition> seniorCompetitions = new ArrayList<>();
+    List<Member> members;
+    private final List<Result> trainingResults = new ArrayList<>();
+    private final List<Competition> competitions = new ArrayList<>();
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
@@ -97,10 +96,10 @@ public class Backend {
         ArrayList<Result> butterfly = new ArrayList<>();
         ArrayList<Result> crawl = new ArrayList<>();
 
-        if (results.isEmpty()) {
+        if (trainingResults.isEmpty()) {
             return null;
         }
-        for (Result result : results) {
+        for (Result result : trainingResults) {
             switch (chosenAge) {
                 case UNDER_AGE -> {
                     if (getAge(result.getMemberNumber()) < 18) {
@@ -228,7 +227,7 @@ public class Backend {
     public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber) {
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
-        results.add(result);
+        trainingResults.add(result);
     }
 
     public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date) {
@@ -253,7 +252,7 @@ public class Backend {
         ArrayList<Result> butterfly = new ArrayList<>();
         ArrayList<Result> crawl = new ArrayList<>();
 
-        if (results.isEmpty() || competitions.isEmpty()) {
+        if (trainingResults.isEmpty() || competitions.isEmpty()) {
             return null;
         }
 
@@ -261,7 +260,7 @@ public class Backend {
 
         switch (choice) {
             case 1 -> {
-                for (Result result : results) {
+                for (Result result : trainingResults) {
                     if (memberNumber == result.getMemberNumber()) {
                         switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
@@ -515,8 +514,28 @@ public class Backend {
     }
 
     public void loadCompetitions() throws IOException {
-        juniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_U18.CSV", "src/CSV/CompetitionResults_U18.CSV");
-        seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
+        List<Competition> juniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_U18.CSV", "src/CSV/CompetitionResults_U18.CSV");
+        List<Competition> seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
+
+        competitions.clear();
+        competitions.addAll(juniorCompetitions);
+
+        for (Competition senior : seniorCompetitions) { //løkken tjekker om der allerede er blevet tilføjet et stævne med samme id fra juniors
+            Competition existingCompetition = null;
+
+            for (Competition competition : competitions) {
+                if (competition.getCompetitionID() == senior.getCompetitionID()) {
+                    existingCompetition = competition;
+                    break;
+                }
+            }
+
+            if (existingCompetition != null) {
+                existingCompetition.getResults().addAll(senior.getResults());
+            } else {
+                competitions.add(senior);
+            }
+        }
     }
 
     public int getMembernumberByEmail(String email) {
