@@ -60,6 +60,7 @@ public class Backend {
         Administrator administrator = new Administrator(adminEmail, adminPassword);
         Member member = administrator.createNewMember(members, firstName, lastName, email, password, birthday, memberType);
         members.add(member);
+        users.add(member);
         fileHandler.saveMembers(members, filePath);
     }
 

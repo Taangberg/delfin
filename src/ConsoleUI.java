@@ -46,15 +46,22 @@ public class ConsoleUI {
                 1. Create new member.
                 2. Edit existing member.
                 3. Remove member.
+                4. Go back
                 """);
         return Integer.parseInt(IO.readln("Input..."));
     }
 
     public void adminRun(String email, String password) throws IOException {
-        switch (adminInput()) {
-            case 1 -> createMember(email, password);
-            case 2 -> editMember();
-            case 3 -> removeMember();
+        boolean running = true;
+
+        while (running) {
+            switch (adminInput()) {
+                case 1 -> createMember(email, password);
+                case 2 -> editMember();
+                case 3 -> removeMember();
+                case 4 -> running = false;
+                default -> IO.println("Give the right input...");
+            }
         }
     }
 
@@ -65,41 +72,47 @@ public class ConsoleUI {
                 2. Update member status
                 3. Create normal Training-time
                 4. Create Competition / Result time
+                5. Go back
                 """);
         return Integer.parseInt(IO.readln("Input..."));
     }
 
     public void trainerRun(String email, String password) {
-        switch (trainermenu()) {
-            case 1 -> {
-                whichTimes();
-            }
-            case 2 -> {
-                int userInput = Integer.parseInt(IO.readln("Which membernumber: "));
-                IO.println("Write true or false, to select or deselect competitor status");
-                backend.changeCompetitorStatus(email, password, userInput, Boolean.parseBoolean(IO.readln("true/false ")));
-            }
-            case 3 ->{
-                createResult(email, password);
-            }
-            case 4 -> {
-                IO.println("""
-                        1. View existing competitions...
-                        2. Create competition
-                        """);
-                switch(Integer.parseInt(IO.readln("Input... "))){
-                    case 1 -> {
-                        IO.println("To create a new time in a given competition, input the competitionID");
-                        backend.printCompetitions();
-                        createCompResult(email, password);
-                    }
-                    case 2 -> {
-                        backend.createCompetition(email, password, IO.readln("Provide arrangement name: "), IO.readln("Provide location name: "), LocalDate.parse(IO.readln("Provide Date for competition: ")));
-                    }
-                }
+        boolean running = true;
 
+        while (running) {
+            switch (trainermenu()) {
+                case 1 -> {
+                    whichTimes();
+                }
+                case 2 -> {
+                    int userInput = Integer.parseInt(IO.readln("Which membernumber: "));
+                    IO.println("Write true or false, to select or deselect competitor status");
+                    backend.changeCompetitorStatus(email, password, userInput, Boolean.parseBoolean(IO.readln("true/false ")));
+                }
+                case 3 -> {
+                    createResult(email, password);
+                }
+                case 4 -> {
+                    IO.println("""
+                            1. View existing competitions...
+                            2. Create competition
+                            """);
+                    switch (Integer.parseInt(IO.readln("Input... "))) {
+                        case 1 -> {
+                            IO.println("To create a new time in a given competition, input the competitionID");
+                            backend.printCompetitions();
+                            createCompResult(email, password);
+                        }
+                        case 2 -> {
+                            backend.createCompetition(email, password, IO.readln("Provide arrangement name: "), IO.readln("Provide location name: "), LocalDate.parse(IO.readln("Provide Date for competition: ")));
+                        }
+                    }
+
+                }
+                case 5 -> running = false;
+                default -> IO.println("Give the right input...");
             }
-            default -> IO.println("Give the right input...");
         }
     }
 
@@ -167,22 +180,28 @@ public class ConsoleUI {
                 --- Hello %s ---
                 1. View Results
                 2. Pay Fee
+                3. Go back
                 """, member.getName()));
         return Integer.parseInt(IO.readln("Input... "));
     }
 
     public void memberRun(Member member, String email){
-        switch(memberMenu(member)){
-            case 1 ->{
-                IO.println("""
-                        1. Training times
-                        2. Competition times
-                        """);
-                int choice = Integer.parseInt(IO.readln("Input..."));
-                IO.println(backend.viewMembertimes(choice, chooseDisciplines(), member));
+        boolean running = true;
+        while (running) {
+            switch (memberMenu(member)) {
+                case 1 -> {
+                    IO.println("""
+                            1. Training times
+                            2. Competition times
+                            """);
+                    int choice = Integer.parseInt(IO.readln("Input..."));
+                    IO.println(backend.viewMembertimes(choice, chooseDisciplines(), member));
 
+                }
+                case 2 -> payMembershipFee(member);
+                case 3 -> running = false;
+                default -> IO.println("Give the right input...");
             }
-            case 2 -> payMembershipFee(member);
         }
     }
 
@@ -240,6 +259,7 @@ public class ConsoleUI {
                     editChoice = EditMember.MEMBER_TYPE;
                 }
                 case 5 -> running = false;
+                default -> IO.println("Give the right input...");
             }
             backend.editMember(memberNumber, editChoice);
         }
@@ -312,6 +332,7 @@ public class ConsoleUI {
             case 2 -> {
                 return Age.ADULT_AGE;
             }
+            default -> IO.println("Give the right input...");
         }
         return null;
     }
@@ -337,6 +358,7 @@ public class ConsoleUI {
             case 4 -> {
                 return Disciplines.CRAWL;
             }
+            default -> IO.println("Give the right input...");
         }
         return null;
     }
