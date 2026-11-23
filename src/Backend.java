@@ -428,5 +428,112 @@ public class Backend {
     public MembershipPayment getMembershipPayment(int memberNumber, int year){
         return membershipFeeService.getMembershipPayment(memberNumber, year);
     }
+
+    public boolean isJuniorResult(Result result) {
+        Member member = printMember(result.getMemberNumber());
+        if (member == null) {
+            throw new IllegalArgumentException("Member not found");
+        }
+        return member.isJuniorAtDate(result.getResultDate());
+    }
+
+    public List<Result> getJuniorResults(List<Result> results) {
+        List<Result> juniorResults = new ArrayList<>();
+        for (Result result : results) {
+            if (isJuniorResult(result)) {
+                juniorResults.add(result);
+            }
+        }
+        return juniorResults;
+    }
+
+    public List<Result> getSeniorResults(List<Result> results) {
+        List<Result> seniorResults = new ArrayList<>();
+        for (Result result : results) {
+            if (!isJuniorResult(result)) {
+                seniorResults.add(result);
+            }
+        }
+        return seniorResults;
+    }
+
+    public List<CompetitionResult> getJuniorCompetitionResults(List<CompetitionResult> competitionResults) {
+        List<CompetitionResult> juniorResults = new ArrayList<>();
+        for (CompetitionResult competitionResult : competitionResults) {
+            if (isJuniorResult(competitionResult.result())) {
+                juniorResults.add(competitionResult);
+            }
+        }
+        return juniorResults;
+    }
+
+    public List<CompetitionResult> getSeniorCompetitionResults(List<CompetitionResult> competitionResults) {
+        List<CompetitionResult> seniorResults = new ArrayList<>();
+        for (CompetitionResult competitionResult : competitionResults) {
+            if (!isJuniorResult(competitionResult.result())) {
+                seniorResults.add(competitionResult);
+            }
+        }
+        return seniorResults;
+    }
+
+    public void saveTrainingResults(List<Result> results) throws IOException {
+        List<Result> juniorResults = getJuniorResults(results);
+        List<Result> seniorResults = getSeniorResults(results);
+
+        fileHandler.saveResults(juniorResults, "src/CSV/TrainingResults_U18.CSV");
+        fileHandler.saveResults(seniorResults, "src/CSV/TrainingResults_O18.CSV");
+    }
+
+    public void saveCompetitionResults(List<CompetitionResult> competitionResults) throws IOException {
+        List<CompetitionResult> juniorResults = getJuniorCompetitionResults(competitionResults);
+        List<CompetitionResult> seniorResults = getSeniorCompetitionResults(competitionResults);
+
+        fileHandler.saveCompetitionResults(juniorResults, "src/CSV/CompetitionResults_U18.CSV");
+        fileHandler.saveCompetitionResults(seniorResults, "src/CSV/CompetitionResults_O18.CSV");
+    }
+
+    public void loadUsers() throws IOException {
+        users.addAll(fileHandler.loadAdministrator("src/CSV/Administrator.CSV"));
+
+        users.addAll(fileHandler.loadTrainers("src/CSV/Trainers.CSV"));
+
+        users.addAll(fileHandler.loadTreasurers("src/CSV/Treasurers.CSV"));
+
+        users.addAll(members);
+    }
+
+    public void loadTrainingResults() throws IOException {
+        List<Result> juniorResults = fileHandler.loadResults("src/CSV/TrainingResults_U18.CSV");
+        List<Result> seniorResults = fileHandler.loadResults("src/CSV/TrainingResults_O18.CSV");
+
+        trainingResults.addAll(juniorResults);
+        trainingResults.addAll(seniorResults);
+    }
+
+    public void loadCompetitions() throws IOException {
+        List<Competition> juniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_U18.CSV", "src/CSV/CompetitionResults_U18.CSV");
+        List<Competition> seniorCompetitions = fileHandler.loadCompetitionsWithResults("src/CSV/Competitions_O18.CSV", "src/CSV/CompetitionResults_O18.CSV");
+
+        competitions.clear();
+        competitions.addAll(juniorCompetitions);
+
+        for (Competition senior : seniorCompetitions) { //løkken tjekker om der allerede er blevet tilføjet et stævne med samme id fra juniors
+            Competition existingCompetition = null;
+
+            for (Competition competition : competitions) {
+                if (competition.getCompetitionID() == senior.getCompetitionID()) {
+                    existingCompetition = competition;
+                    break;
+                }
+            }
+
+            if (existingCompetition != null) {
+                existingCompetition.getResults().addAll(senior.getResults());
+            } else {
+                competitions.add(senior);
+            }
+        }
+    }
 }
 
