@@ -320,6 +320,7 @@ public class Backend {
     }
 
 
+
     public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
         Trainer trainer = new Trainer(email, password);
         trainer.changeCompetitorStatus(printMember(memberNumber), choice);
