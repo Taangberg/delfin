@@ -3,6 +3,7 @@ package CSV;
 import Competition.Competition;
 import Disciplines.Disciplines;
 import Disciplines.Result;
+import Disciplines.CompetitionResult;
 import User_And_Member.*;
 
 import java.time.LocalDate;
@@ -108,5 +109,22 @@ public class CSVMapper {
                 + competition.getArrangement() + delimiter
                 + competition.getLocation() + delimiter
                 + competition.getDate();
+    }
+
+    public CompetitionResult fromCSVCompetitionResult(String line) {
+        String[] tokens = line.split(delimiter, -1);
+
+        int competitionID = Integer.parseInt(tokens[0]);
+
+        String resultData = line.substring(line.indexOf(delimiter) + 1);
+
+        Result result = fromCSVResults(resultData);
+
+        return new CompetitionResult(competitionID, result);
+    }
+
+    public String toCSVCompetitionResult(CompetitionResult competitionResult) {
+        return competitionResult.competitionID() + delimiter
+                + toCSVResults(competitionResult.result());
     }
 }

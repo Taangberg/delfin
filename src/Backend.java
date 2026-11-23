@@ -12,8 +12,8 @@ import java.util.List;
 public class Backend {
     List<User> users = new ArrayList<>();
     List<Member> members;
-    List<Result> results = new ArrayList<>();
-    List<Competition> competitions = new ArrayList<>();
+    private final List<Result> trainingResults = new ArrayList<>();
+    private final List<Competition> competitions = new ArrayList<>();
     private final FileHandler fileHandler;
     private final String filePath;
     ConsoleUI ui;
@@ -25,6 +25,9 @@ public class Backend {
         CSVMapper csvMapper = new CSVMapper();
         this.fileHandler = new FileHandler(csvMapper);
         this.members = fileHandler.loadMembers(filePath);
+        loadUsers();
+        loadTrainingResults();
+        loadCompetitions();
     }
 
     public void login(String email, String password) throws IOException {
@@ -45,7 +48,7 @@ public class Backend {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
                     ui.memberRun((Member)user, email);
                 }
-        }
+            }
         }
     }
 
@@ -66,12 +69,12 @@ public class Backend {
                 } else if (editChoice == EditMember.EMAIL) {
                     member.setEmail(ui.email());
                 } else if (editChoice == EditMember.MEMBER_TYPE) {
-                   MemberType newType = ui.memberType();
-                   if(newType == MemberType.COMPETITOR) {
-                       IO.println("User not allowed to edit competitors");
-                       return;
-                   }
-                   member.setMemberType(newType);
+                    MemberType newType = ui.memberType();
+                    if (newType == MemberType.COMPETITOR) {
+                        IO.println("User not allowed to edit competitors");
+                        return;
+                    }
+                    member.setMemberType(newType);
                 }
             }
         }
@@ -91,10 +94,10 @@ public class Backend {
         ArrayList<Result> butterfly = new ArrayList<>();
         ArrayList<Result> crawl = new ArrayList<>();
 
-        if (results.isEmpty()) {
+        if (trainingResults.isEmpty()) {
             return null;
         }
-        for (Result result : results) {
+        for (Result result : trainingResults) {
             switch (chosenAge) {
                 case UNDER_AGE -> {
                     if (getAge(result.getMemberNumber()) < 18) {
@@ -160,8 +163,8 @@ public class Backend {
         if (competitions.isEmpty()) {
             return null;
         }
-        for(int i = 0; i < competitions.size() ; i++) {
-            for(Result result : competitions.get(i).getResults()) {
+        for (int i = 0; i < competitions.size(); i++) {
+            for (Result result : competitions.get(i).getResults()) {
                 switch (chosenAge) {
                     case UNDER_AGE -> {
                         if (getAge(result.getMemberNumber()) < 18){
@@ -222,12 +225,12 @@ public class Backend {
     public void createResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
-        results.add(result);
+        trainingResults.add(result);
     }
 
-    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date){
-        Trainer trainer = new Trainer(trainerEmail,trainerPassword);
-        Competition competition = trainer.createCompetition(competitions,arrangement,location,date);
+    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date) {
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+        Competition competition = trainer.createCompetition(competitions, arrangement, location, date);
         competitions.add(competition);
     }
 
@@ -247,7 +250,7 @@ public class Backend {
         ArrayList<Result> butterfly = new ArrayList<>();
         ArrayList<Result> crawl = new ArrayList<>();
 
-        if (results.isEmpty() || competitions.isEmpty()) {
+        if (trainingResults.isEmpty() || competitions.isEmpty()) {
             return null;
         }
 
@@ -255,7 +258,7 @@ public class Backend {
 
         switch (choice) {
             case 1 -> {
-                for (Result result : results) {
+                for (Result result : trainingResults) {
                     if (memberNumber == result.getMemberNumber()) {
                         switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
@@ -371,7 +374,8 @@ public class Backend {
     public List<MembershipPayment> getUnpaidPayments(int year) {
         return membershipFeeService.getUnpaidPayments(year);
     }
-    public List<MembershipPayment> getPaidPayments(int year){
+
+    public List<MembershipPayment> getPaidPayments(int year) {
         return membershipFeeService.getPaidPayments(year);
     }
 

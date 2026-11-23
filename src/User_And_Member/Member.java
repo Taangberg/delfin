@@ -55,6 +55,10 @@ public class Member extends User {
         return getAge() < 18;
     }
 
+    public boolean isJuniorAtDate(LocalDate resultDate) {
+        return Period.between(birthday, resultDate).getYears() < 18;
+    }
+
     public boolean isOld() {
         return getAge() >= 60;
     }
