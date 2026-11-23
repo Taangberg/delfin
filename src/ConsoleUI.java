@@ -179,7 +179,7 @@ public class ConsoleUI {
                         2. Competition times
                         """);
                 int choice = Integer.parseInt(IO.readln("Input..."));
-                IO.println(backend.viewMembertimes(choice, printDiscplines(), email));
+                IO.println(backend.viewMembertimes(choice, chooseDisciplines(), member));
 
             }
             case 2 -> payMembershipFee(member);
@@ -192,23 +192,21 @@ public class ConsoleUI {
                 2.Competition times
                 """);
         if (Integer.parseInt(IO.readln("Input...")) == 1) {
-            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), printDiscplines()));
+            IO.println(backend.viewTimes(printChooseMemberAgeGroup(), chooseDisciplines()));
         } else if(Integer.parseInt(IO.readln("Input..."))==2){
-            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), printDiscplines()));
+            IO.println(backend.viewCompTimes(printChooseMemberAgeGroup(), chooseDisciplines()));
         }
     }
 
     public void createResult(String email, String password){
         int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
-        printDiscplines();
-        backend.createResult(email, password, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
+        backend.createResult(email, password,chooseDisciplines(), inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), memberNumber);
     }
 
     public void createCompResult(String email, String password){
         int competitionID = Integer.parseInt(IO.readln("Input..."));
         int memberNumber = Integer.parseInt(IO.readln("Which membernumber: "));
-        printDiscplines();
-        backend.createCompResult(email, password, competitionID, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), chooseDisciplines(), memberNumber);
+        backend.createCompResult(email, password,chooseDisciplines(), competitionID, inputTimes(1), inputTimes(2), inputTimes(3), createResultDate(), memberNumber);
     }
 
     public void createMember(String email, String password) throws IOException {
@@ -318,7 +316,7 @@ public class ConsoleUI {
         return null;
     }
 
-    public int printDiscplines(){
+    public Disciplines chooseDisciplines(){
         IO.println("""
                 1. Backcrawl
                 2. Breast Swimming
@@ -326,11 +324,7 @@ public class ConsoleUI {
                 4. Crawl
                 """);
 
-        return Integer.parseInt(IO.readln("Input..."));
-    }
-
-    public Disciplines chooseDisciplines(){
-        switch (printDiscplines()){
+        switch (Integer.parseInt(IO.readln("Input..."))){
             case 1 -> {
                 return Disciplines.BACKCRAWL;
             }

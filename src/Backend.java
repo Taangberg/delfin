@@ -85,7 +85,7 @@ public class Backend {
         }
     }
 
-    public ArrayList<Result> viewTimes(Age chosenAge,int input) {
+    public ArrayList<Result> viewTimes(Age chosenAge,Disciplines input) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -134,16 +134,16 @@ public class Backend {
                 }
             }
             switch (input) {
-                case 1 -> {
+                case BACKCRAWL -> {
                     return backCrawl;
                 }
-                case 2 -> {
+                case BREASTSWIMMING -> {
                     return breastSwimming;
                 }
-                case 3 -> {
+                case BUTTERFLY -> {
                     return butterfly;
                 }
-                case 4 -> {
+                case CRAWL -> {
                     return crawl;
                 }
             }
@@ -151,7 +151,7 @@ public class Backend {
         return null;
     }
 
-    public ArrayList<Result> viewCompTimes(Age chosenAge, int input){
+    public ArrayList<Result> viewCompTimes(Age chosenAge, Disciplines input){
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -203,23 +203,23 @@ public class Backend {
             }
         }
         switch (input) {
-            case 1 -> {
+            case BACKCRAWL -> {
                 return backCrawl;
             }
-            case 2 -> {
+            case BREASTSWIMMING -> {
                 return breastSwimming;
             }
-            case 3 -> {
+            case BUTTERFLY -> {
                 return butterfly;
             }
-            case 4 -> {
+            case CRAWL -> {
                 return crawl;
             }
         }
         return null;
     }
 
-    public void createResult(String trainerEmail, String trainerPassword, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+    public void createResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         results.add(result);
@@ -231,7 +231,7 @@ public class Backend {
         competitions.add(competition);
     }
 
-    public void createCompResult(String trainerEmail, String trainerPassword, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, Disciplines disciplines, int memberNumber){
+    public void createCompResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         for(Competition competition : competitions){
@@ -241,7 +241,7 @@ public class Backend {
         }
     }
 
-    public ArrayList<Result> viewMembertimes(int choice, int input, String email) {
+    public ArrayList<Result> viewMembertimes(int choice, Disciplines input, Member member) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -251,7 +251,7 @@ public class Backend {
             return null;
         }
 
-        int memberNumber = getMembernumberByEmail(email);
+        int memberNumber = member.getMemberNumber();
 
         switch (choice) {
             case 1 -> {
@@ -298,16 +298,16 @@ public class Backend {
 
 
                 switch (input) {
-                    case 1 -> {
+                    case BACKCRAWL -> {
                         return backCrawl;
                     }
-                    case 2 -> {
+                    case BREASTSWIMMING -> {
                         return breastSwimming;
                     }
-                    case 3 -> {
+                    case BUTTERFLY -> {
                         return butterfly;
                     }
-                    case 4 -> {
+                    case CRAWL -> {
                         return crawl;
                     }
                 }
@@ -345,94 +345,6 @@ public class Backend {
                 ui.printCompetitions(competition);
             }
         }
-    }
-
-    public void printJuniors() {
-        List<Member> juniors = new ArrayList<>();
-
-        for(Member member : members) {
-            if(member.isJunior()) {
-                juniors.add(member);
-            }
-        }
-        for(Member junior : juniors) {
-            ui.printMembers(junior);
-        }
-    }
-
-    public void printSeniors() {
-        List<Member> seniors = new ArrayList<>();
-
-        for(Member member : members) {
-            if(!member.isJunior()) {
-                seniors.add(member);
-            }
-        }
-        for(Member senior : seniors) {
-            ui.printMembers(senior);
-        }
-    }
-
-    public void printExercisers() {
-        List<Member> exercisers = new ArrayList<>();
-
-        for(Member member : members) {
-            if(member.getMemberType() == MemberType.EXERCISER) {
-                exercisers.add(member);
-            }
-        }
-        for (Member exerciser : exercisers) {
-            ui.printMembers(exerciser);
-        }
-    }
-
-    public void printCompetitorsU18() {
-        List<Member> u18 = new ArrayList<>();
-
-        for(Member member : members) {
-            if(member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
-                u18.add(member);
-            }
-        }
-        for(Member juniors : u18) {
-            ui.printMembers(juniors);
-        }
-    }
-
-    public void printCompetitorsO18() {
-        List<Member> o18 = new ArrayList<>();
-
-        for(Member member : members) {
-            if(!member.isJunior() && member.getMemberType() == MemberType.COMPETITOR) {
-                o18.add(member);
-            }
-        }
-        for(Member seniors : o18) {
-            ui.printMembers(seniors);
-        }
-    }
-
-
-    public void printPassive() {
-        List<Member> passive = new ArrayList<>();
-
-        for(Member member : members) {
-            if(member.getMemberType() == MemberType.PASSIVE) {
-                passive.add(member);
-            }
-        }
-        for(Member passives : passive) {
-            ui.printMembers(passives);
-        }
-    }
-
-    public int getMembernumberByEmail(String email){
-        for(Member member : members){
-            if(member.getEmail().equalsIgnoreCase(email)){
-                return member.getMemberNumber();
-            }
-        }
-        return 0;
     }
 
     public int getAge(int memberNumber){
