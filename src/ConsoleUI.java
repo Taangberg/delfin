@@ -210,7 +210,7 @@ public class ConsoleUI {
     }
 
     public void createMember(String email, String password) throws IOException {
-        backend.createMember(email, password, firstName(), lastName(), email(), password(), LocalDate.parse(IO.readln("Input birthday: YYYY.MM.DD ")), memberType());
+        backend.createMember(email, password, firstName(), lastName(), email(), password(), LocalDate.parse(IO.readln("Input birthday: YYYY,MM,DD ")), memberType());
     }
 
     public void editMember() {

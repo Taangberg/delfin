@@ -30,6 +30,10 @@ public class Backend {
         loadCompetitions();
     }
 
+    public void setUI(ConsoleUI newUi){
+        ui = newUi;
+    }
+
     public void login(String email, String password) throws IOException {
         for (User user : users) {
             if (user instanceof Administrator) {
