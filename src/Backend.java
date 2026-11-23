@@ -48,7 +48,7 @@ public class Backend {
                 }
             } else if (user instanceof Member) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.memberRun(email);
+                    ui.memberRun((Member)user, email);
                 }
             }
         }
@@ -567,6 +567,7 @@ public class Backend {
         return membershipFeeService.calculateTotalUnpaidIncome(year);
     }
 
+    /* Funktion længere ned gør det samme, men det her kan måske bruges andet sted.(ikke slet endnu)
     public List<MembershipPayment> getUnpaidPayments(int year) {
         return membershipFeeService.getUnpaidPayments(year);
     }
@@ -574,6 +575,8 @@ public class Backend {
     public List<MembershipPayment> getPaidPayments(int year) {
         return membershipFeeService.getPaidPayments(year);
     }
+
+     */
 
     public boolean registerMembershipPayment(int memberNumber, int year) {
         return membershipFeeService.registerPayment(memberNumber, year);
@@ -609,6 +612,16 @@ public class Backend {
                 IO.println("--------------------");
             }
         }
+    }
+
+    public int calculateMembershipFee(Member member){
+        return membershipFeeService.calculateMembershipFee(member);
+    }
+    public boolean payMembershipFee(Member member, int year){
+        return membershipFeeService.payMembershipFee(member, year);
+    }
+    public MembershipPayment getMembershipPayment(int memberNumber, int year){
+        return membershipFeeService.getMembershipPayment(memberNumber, year);
     }
 }
 

@@ -26,13 +26,15 @@ public class ConsoleUI {
     }
 
     private void showStartMenu() {
-        IO.println();
-        IO.println(" 1. | Log in");
-        IO.println(" 2. | Exit");
-        IO.println();
+        IO.println("""
+                --- Welcome! ---
+                1. | Log in
+                2. | Exit
+                """);
     }
 
     public void login() throws IOException {
+        IO.println("--- Login Page ---");
         String email = IO.readln("Input Email: ");
         String password = IO.readln("Input Password: ");
         backend.login(email, password);
@@ -40,6 +42,7 @@ public class ConsoleUI {
 
     public int adminInput() {
         IO.println("""
+                --- Admin Menu ---
                 1. Create new member.
                 2. Edit existing member.
                 3. Remove member.
@@ -57,6 +60,7 @@ public class ConsoleUI {
 
     public int trainermenu() {
         IO.println("""
+                --- Trainer Menu ---
                 1. View Times
                 2. Update member status
                 3. Create normal Training-time
@@ -158,27 +162,27 @@ public class ConsoleUI {
         }
     }
 
-    public int memberMenu(){
-        IO.println("""
+    public int memberMenu(Member member){
+        IO.println(String.format("""
+                --- Hello %s ---
                 1. View Results
                 2. Pay Fee
-                """);
+                """, member.getName()));
         return Integer.parseInt(IO.readln("Input... "));
     }
 
-    public void memberRun(String email){
-        switch(memberMenu()){
+    public void memberRun(Member member, String email){
+        switch(memberMenu(member)){
             case 1 ->{
-
-            }
-            case 2 ->{
                 IO.println("""
                         1. Training times
                         2. Competition times
                         """);
                 int choice = Integer.parseInt(IO.readln("Input..."));
                 IO.println(backend.viewMembertimes(choice, printDiscplines(), email));
+
             }
+            case 2 -> payMembershipFee(member);
         }
     }
 
@@ -342,4 +346,47 @@ public class ConsoleUI {
         }
         return null;
     }
+
+    public void printMembershipReceipt(Member member, int year){
+        MembershipPayment payment = backend.getMembershipPayment(member.getMemberNumber(), year);
+
+        if (payment != null && payment.isPaid()){
+            IO.println("""
+                --- Membership Receipt ---
+                Name: %s %s
+                Member number: %d
+                Year: %d
+                Amount: %d kr.
+                --------------------------
+                """.formatted(
+                    member.getName(),
+                    member.getLastName(),
+                    member.getMemberNumber(),
+                    payment.getYear(),
+                    payment.getAmount()
+            ));
+        }
+    }
+
+    public void payMembershipFee(Member member){
+        int year = LocalDate.now().getYear();
+        int amount = backend.calculateMembershipFee(member);
+
+        IO.println("Your membership fee is: " + amount + " kr.");
+        String confirmation = IO.readln("Do you want to pay? (yes/no)");
+
+        if (confirmation.equalsIgnoreCase("Yes")){
+            boolean paid = backend.payMembershipFee(member, year);
+
+            if (paid) {
+                IO.println("Payment successfull");
+                printMembershipReceipt(member, year);
+            } else {
+                IO.println("Membership fee has already been paid.");
+            }
+        } else {
+            IO.println("Payment cancelled.");
+        }
+    }
+
 }

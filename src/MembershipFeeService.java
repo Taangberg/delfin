@@ -66,8 +66,12 @@ public class MembershipFeeService {
 
     public boolean registerPayment(int memberNumber, int year) {
         for (MembershipPayment payment : payments) {
-            if (payment.getMemberNumber() == memberNumber
-                    && payment.getYear() == year) {
+            if (payment.getMemberNumber() == memberNumber && payment.getYear() == year) {
+                payment.setPaid(true);
+
+                if (payment.isPaid()){
+                    return false;
+                }
                 payment.setPaid(true);
                 return true;
             }
@@ -115,5 +119,19 @@ public class MembershipFeeService {
         for (Member member : members) {
             createMembershipPayment(member, year);
         }
+    }
+
+    public MembershipPayment getMembershipPayment(int memberNumber, int year){
+        for (MembershipPayment payment : payments){
+            if (payment.getMemberNumber() == memberNumber && payment.getYear() == year){
+                return payment;
+            }
+        }
+        return null;
+    }
+
+    public boolean payMembershipFee(Member member, int year){
+        createMembershipPayment(member,year);
+        return registerPayment(member.getMemberNumber(),year);
     }
 }
