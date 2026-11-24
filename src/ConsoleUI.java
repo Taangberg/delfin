@@ -292,10 +292,6 @@ public class ConsoleUI {
         return LocalDate.parse(IO.readln("Input Result Date in format (year,month,day): "));
     }
 
-    public void printMembers(Member member) {
-        IO.println(member);
-    }
-
     public void printCompetitions(Competition competition){
         IO.println(competition);
     }

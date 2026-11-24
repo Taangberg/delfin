@@ -11,26 +11,23 @@ import java.util.List;
 
 public class Backend {
     List<User> users = new ArrayList<>();
-    List<Member> members;
     private final List<Result> trainingResults = new ArrayList<>();
     private final List<Competition> competitions = new ArrayList<>();
     private final FileHandler fileHandler;
-    private final String filePath;
+
     ConsoleUI ui;
     private final MembershipFeeService membershipFeeService = new MembershipFeeService();
 
-    public Backend(String filePath) throws IOException {
-        this.filePath = filePath;
+    public Backend() throws IOException {
 
         CSVMapper csvMapper = new CSVMapper();
         this.fileHandler = new FileHandler(csvMapper);
-        this.members = fileHandler.loadMembers(filePath);
         loadUsers();
         loadTrainingResults();
         loadCompetitions();
     }
 
-    public void setUI(ConsoleUI newUi){
+    public void setUI(ConsoleUI newUi) {
         ui = newUi;
     }
 
@@ -50,7 +47,7 @@ public class Backend {
                 }
             } else if (user instanceof Member) {
                 if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.memberRun((Member)user, email);
+                    ui.memberRun((Member) user, email);
                 }
             }
         }
@@ -58,41 +55,46 @@ public class Backend {
 
     public void createMember(String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) throws IOException {
         Administrator administrator = new Administrator(adminEmail, adminPassword);
-        Member member = administrator.createNewMember(members, firstName, lastName, email, password, birthday, memberType);
-        members.add(member);
-        fileHandler.saveMembers(members, filePath);
+        List<Member> members = new ArrayList<>();
+        Member member = administrator.createNewMember(users, firstName, lastName, email, password, birthday, memberType);
+        users.add(member);
+        fileHandler.saveMembers(members, "src/CSV/Members.CSV");
     }
 
     public void editMember(int memberNumber, EditMember editChoice) {
-        for (Member member : members) {
-            if (member.getMemberNumber() == memberNumber) {
-                if (editChoice == EditMember.FIRSTNAME) {
-                    member.setName(ui.firstName());
-                } else if (editChoice == EditMember.LASTNAME) {
-                    member.setLastName(ui.lastName());
-                } else if (editChoice == EditMember.EMAIL) {
-                    member.setEmail(ui.email());
-                } else if (editChoice == EditMember.MEMBER_TYPE) {
-                    MemberType newType = ui.memberType();
-                    if (newType == MemberType.COMPETITOR) {
-                        IO.println("User not allowed to edit competitors");
-                        return;
+        for (User user : users) {
+            if (user instanceof Member member) {
+                if (member.getMemberNumber() == memberNumber) {
+                    if (editChoice == EditMember.FIRSTNAME) {
+                        member.setName(ui.firstName());
+                    } else if (editChoice == EditMember.LASTNAME) {
+                        member.setLastName(ui.lastName());
+                    } else if (editChoice == EditMember.EMAIL) {
+                        member.setEmail(ui.email());
+                    } else if (editChoice == EditMember.MEMBER_TYPE) {
+                        MemberType newType = ui.memberType();
+                        if (newType == MemberType.COMPETITOR) {
+                            IO.println("User not allowed to edit competitors");
+                            return;
+                        }
+                        member.setMemberType(newType);
                     }
-                    member.setMemberType(newType);
                 }
             }
         }
     }
 
     public void removeMember(int memberNumber) {
-        for (Member member : members) {
-            if (member.getMemberNumber() == memberNumber) {
-                members.remove(member);
+        for (User user : users) {
+            if (user instanceof Member member) {
+                if (member.getMemberNumber() == memberNumber) {
+                    users.remove(member);
+                }
             }
         }
     }
 
-    public ArrayList<Result> viewTimes(Age chosenAge,Disciplines input) {
+    public ArrayList<Result> viewTimes(Age chosenAge, Disciplines input) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -105,7 +107,7 @@ public class Backend {
             switch (chosenAge) {
                 case UNDER_AGE -> {
                     if (getAge(result.getMemberNumber()) < 18) {
-                        switch(result.getDiscipline()){
+                        switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
                                 backCrawl.add(result);
                             }
@@ -123,7 +125,7 @@ public class Backend {
                 }
                 case ADULT_AGE -> {
                     if (getAge(result.getMemberNumber()) >= 18) {
-                        switch(result.getDiscipline()){
+                        switch (result.getDiscipline()) {
                             case BACKCRAWL -> {
                                 backCrawl.add(result);
                             }
@@ -158,7 +160,7 @@ public class Backend {
         return null;
     }
 
-    public ArrayList<Result> viewCompTimes(Age chosenAge, Disciplines input){
+    public ArrayList<Result> viewCompTimes(Age chosenAge, Disciplines input) {
         ArrayList<Result> backCrawl = new ArrayList<>();
         ArrayList<Result> breastSwimming = new ArrayList<>();
         ArrayList<Result> butterfly = new ArrayList<>();
@@ -171,8 +173,8 @@ public class Backend {
             for (Result result : competitions.get(i).getResults()) {
                 switch (chosenAge) {
                     case UNDER_AGE -> {
-                        if (getAge(result.getMemberNumber()) < 18){
-                            switch(result.getDiscipline()){
+                        if (getAge(result.getMemberNumber()) < 18) {
+                            switch (result.getDiscipline()) {
                                 case BACKCRAWL -> {
                                     backCrawl.add(result);
                                 }
@@ -189,8 +191,8 @@ public class Backend {
                         }
                     }
                     case ADULT_AGE -> {
-                        if (getAge(result.getMemberNumber()) >= 18){
-                            switch(result.getDiscipline()){
+                        if (getAge(result.getMemberNumber()) >= 18) {
+                            switch (result.getDiscipline()) {
                                 case BACKCRAWL -> {
                                     backCrawl.add(result);
                                 }
@@ -226,7 +228,7 @@ public class Backend {
         return null;
     }
 
-    public void createResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
+    public void createResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber) {
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         trainingResults.add(result);
@@ -238,11 +240,11 @@ public class Backend {
         competitions.add(competition);
     }
 
-    public void createCompResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
+    public void createCompResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber) {
         Trainer trainer = new Trainer(trainerEmail, trainerPassword);
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
-        for(Competition competition : competitions){
-            if(competition.getCompetitionID() == competitionID) {
+        for (Competition competition : competitions) {
+            if (competition.getCompetitionID() == competitionID) {
                 competition.getResults().add(result);
             }
         }
@@ -324,48 +326,49 @@ public class Backend {
     }
 
 
-
-
-    public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice){
+    public void changeCompetitorStatus(String email, String password, int memberNumber, boolean choice) {
         Trainer trainer = new Trainer(email, password);
         trainer.changeCompetitorStatus(printMember(memberNumber), choice);
     }
 
     public void printMembers() {
-        for (Member member : members) {
-            if(!members.isEmpty()) {
-                ui.printMembers(member);
+        List<User> members = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof Member) {
+                members.add(user);
             }
         }
     }
 
     public Member printMember(int memberNumber) {
-        for (Member member : members) {
-            if (member.getMemberNumber() == memberNumber) {
-                return member;
+        for (User user : users) {
+            if (user instanceof Member member) {
+                if (member.getMemberNumber() == memberNumber) {
+                    return member;
+                }
             }
         }
         return null;
     }
 
-    public void printCompetitions(){
-        for(Competition competition : competitions){
-            if(!competitions.isEmpty()){
+    public void printCompetitions() {
+        for (Competition competition : competitions) {
+            if (!competitions.isEmpty()) {
                 ui.printCompetitions(competition);
             }
         }
     }
 
-    public int getAge(int memberNumber){
+    public int getAge(int memberNumber) {
         return printMember(memberNumber).getAge();
     }
 
     public int calculateTotalExpectedIncome() {
-        return membershipFeeService.calculateTotalExpectedIncome(members);
+        return membershipFeeService.calculateTotalExpectedIncome(users);
     }
 
     public void createPaymentsForAllMembers(int year) {
-        membershipFeeService.createPaymentsForAllMembers(members, year);
+        membershipFeeService.createPaymentsForAllMembers(users, year);
     }
 
     public int calculateTotalPaidIncome(int year) {
@@ -398,7 +401,7 @@ public class Backend {
             Member member = printMember(payment.getMemberNumber());
 
             if (member != null) {
-                ui.printMembers(member);
+                printMember(payment.getMemberNumber());
                 IO.println("Payment year: " + payment.getYear());
                 IO.println("Amount: " + payment.getAmount());
                 IO.println("Status: Unpaid");
@@ -407,14 +410,14 @@ public class Backend {
         }
     }
 
-    public void printMembersWithPaidMembership(int year){
+    public void printMembersWithPaidMembership(int year) {
         List<MembershipPayment> paidPayments = membershipFeeService.getPaidPayments(year);
 
-        for (MembershipPayment payment : paidPayments){
+        for (MembershipPayment payment : paidPayments) {
             Member member = printMember(payment.getMemberNumber());
 
-            if (member != null){
-                ui.printMembers(member);
+            if (member != null) {
+                printMember(payment.getMemberNumber());
                 IO.println("Payment year: " + payment.getYear());
                 IO.println("Amount: " + payment.getAmount());
                 IO.println("Status: Paid");
@@ -423,13 +426,15 @@ public class Backend {
         }
     }
 
-    public int calculateMembershipFee(Member member){
+    public int calculateMembershipFee(Member member) {
         return membershipFeeService.calculateMembershipFee(member);
     }
-    public boolean payMembershipFee(Member member, int year){
+
+    public boolean payMembershipFee(Member member, int year) {
         return membershipFeeService.payMembershipFee(member, year);
     }
-    public MembershipPayment getMembershipPayment(int memberNumber, int year){
+
+    public MembershipPayment getMembershipPayment(int memberNumber, int year) {
         return membershipFeeService.getMembershipPayment(memberNumber, year);
     }
 
@@ -504,12 +509,14 @@ public class Backend {
 
         users.addAll(fileHandler.loadTreasurers("src/CSV/Treasurers.CSV"));
 
-        users.addAll(members);
+        users.addAll(fileHandler.loadMembers("src/CSV/Members.CSV"));
     }
 
     public void loadTrainingResults() throws IOException {
         List<Result> juniorResults = fileHandler.loadResults("src/CSV/TrainingResults_U18.CSV");
         List<Result> seniorResults = fileHandler.loadResults("src/CSV/TrainingResults_O18.CSV");
+
+
 
         trainingResults.addAll(juniorResults);
         trainingResults.addAll(seniorResults);

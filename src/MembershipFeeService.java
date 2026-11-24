@@ -1,5 +1,6 @@
 import User_And_Member.Member;
 import User_And_Member.MemberType;
+import User_And_Member.User;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -26,14 +27,15 @@ public class MembershipFeeService {
         }
     }
 
-    public int calculateTotalExpectedIncome(List<Member> members) {
+    public int calculateTotalExpectedIncome(List<User> users) {
         int total = 0;
 
-        for (Member member : members) {
-            total += calculateMembershipFee(member);
+        for (User user : users) {
+            if (user instanceof Member member) {
+                total += calculateMembershipFee(member);
+            }
         }
-
-        return total;
+            return total;
     }
 
     public int calculateTotalPaidIncome(int year) {
@@ -115,9 +117,11 @@ public class MembershipFeeService {
         return total;
     }
 
-    public void createPaymentsForAllMembers(List<Member> members, int year) {
-        for (Member member : members) {
-            createMembershipPayment(member, year);
+    public void createPaymentsForAllMembers(List<User> users, int year) {
+        for (User user : users) {
+            if (user instanceof Member member) {
+                createMembershipPayment(member, year);
+            }
         }
     }
 
