@@ -33,32 +33,26 @@ public class Backend {
 
     public void login(String email, String password) throws IOException {
         for (User user : users) {
-            if (user instanceof Administrator) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
+                if (user instanceof Administrator) {
                     ui.adminRun(email, password);
-                }
-            } else if (user instanceof Trainer) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
+                } else if (user instanceof Trainer) {
                     ui.trainerRun(email, password);
-                }
-            } else if (user instanceof Treasurer) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
+                } else if (user instanceof Treasurer) {
                     ui.treasurerRun();
-                }
-            } else if (user instanceof Member) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
+                } else if (user instanceof Member) {
                     ui.memberRun((Member) user, email);
                 }
+                return;
             }
         }
+        IO.println("Invalid email or password");
     }
 
     public void createMember(String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) throws IOException {
         Administrator administrator = new Administrator(adminEmail, adminPassword);
-        List<Member> members = new ArrayList<>();
         Member member = administrator.createNewMember(users, firstName, lastName, email, password, birthday, memberType);
         users.add(member);
-        fileHandler.saveMembers(members, "src/CSV/Members.CSV");
     }
 
     public void editMember(int memberNumber, EditMember editChoice) {
@@ -332,10 +326,9 @@ public class Backend {
     }
 
     public void printMembers() {
-        List<User> members = new ArrayList<>();
         for (User user : users) {
-            if (user instanceof Member) {
-                members.add(user);
+            if (user instanceof Member member) {
+                IO.println(member);
             }
         }
     }
@@ -486,6 +479,66 @@ public class Backend {
         return seniorResults;
     }
 
+    public List<CompetitionResult> getAllCompetitionResults() {
+        List<CompetitionResult> competitionResults = new ArrayList<>();
+        for (Competition competition : competitions) {
+            for (Result result : competition.getResults()) {
+                competitionResults.add(new CompetitionResult(competition.getCompetitionID(), result));
+            }
+        }
+        return competitionResults;
+    }
+
+    public void saveUsers() throws IOException {
+        List<Administrator> administrators = new ArrayList<>();
+        List<Member> members = new ArrayList<>();
+        List<Trainer> trainers = new ArrayList<>();
+        List<Treasurer> treasurers = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof Administrator administrator) {
+                administrators.add(administrator);
+            }
+            if (user instanceof Member member) {
+                members.add(member);
+            }
+            if (user instanceof Trainer trainer) {
+                trainers.add(trainer);
+            }
+            if (user instanceof Treasurer treasurer) {
+                treasurers.add(treasurer);
+            }
+        }
+        fileHandler.saveAdministrator(administrators, "src/CSV/Administrator.CSV");
+        fileHandler.saveMembers(members, "src/CSV/Members.CSV");
+        fileHandler.saveTrainers(trainers, "src/CSV/Trainers.CSV");
+        fileHandler.saveTreasurers(treasurers, "src/CSV/Treasurers.CSV");
+    }
+
+    public void saveCompetitions() throws IOException {
+        List<Competition> juniorCompetitions = new ArrayList<>();
+        List<Competition> seniorCompetitions = new ArrayList<>();
+
+        for (Competition competition : competitions) {
+            boolean hasJunior = false;
+            boolean hasSenior = false;
+            for (Result result : competition.getResults()) {
+                if (isJuniorResult(result)) {
+                    hasJunior = true;
+                } else {
+                    hasSenior = true;
+                }
+            }
+            if (hasJunior) {
+                juniorCompetitions.add(competition);
+            }
+            if (hasSenior) {
+                seniorCompetitions.add(competition);
+            }
+        }
+        fileHandler.saveCompetitions(juniorCompetitions, "src/CSV/Competitions_U18.CSV");
+        fileHandler.saveCompetitions(seniorCompetitions, "src/CSV/Competitions_O18.CSV");
+    }
+
     public void saveTrainingResults(List<Result> results) throws IOException {
         List<Result> juniorResults = getJuniorResults(results);
         List<Result> seniorResults = getSeniorResults(results);
@@ -502,13 +555,18 @@ public class Backend {
         fileHandler.saveCompetitionResults(seniorResults, "src/CSV/CompetitionResults_O18.CSV");
     }
 
+    public void saveAll() throws IOException {
+        saveUsers();
+        saveCompetitions();
+        saveTrainingResults(trainingResults);
+        saveCompetitionResults(getAllCompetitionResults());
+    }
+
     public void loadUsers() throws IOException {
+        users.clear();
         users.addAll(fileHandler.loadAdministrator("src/CSV/Administrator.CSV"));
-
         users.addAll(fileHandler.loadTrainers("src/CSV/Trainers.CSV"));
-
         users.addAll(fileHandler.loadTreasurers("src/CSV/Treasurers.CSV"));
-
         users.addAll(fileHandler.loadMembers("src/CSV/Members.CSV"));
     }
 
@@ -516,7 +574,7 @@ public class Backend {
         List<Result> juniorResults = fileHandler.loadResults("src/CSV/TrainingResults_U18.CSV");
         List<Result> seniorResults = fileHandler.loadResults("src/CSV/TrainingResults_O18.CSV");
 
-
+        trainingResults.clear();
 
         trainingResults.addAll(juniorResults);
         trainingResults.addAll(seniorResults);
