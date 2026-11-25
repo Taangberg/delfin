@@ -18,8 +18,12 @@ public class ConsoleUI {
             showStartMenu();
             int choice = Integer.parseInt(IO.readln("Choose a option, to continue "));
             switch (choice) {
+                case 0 -> backend.saveAll();
                 case 1 -> login();
-                case 2 -> running = false;
+                case 2 -> {
+                    backend.saveAll();
+                    running = false;
+                }
                 default -> IO.println("Invalid input");
             }
         }
@@ -310,10 +314,6 @@ public class ConsoleUI {
 
     public LocalDate createResultDate(){
         return LocalDate.parse(IO.readln("Input Result Date in format (year,month,day): "));
-    }
-
-    public void printMembers(Member member) {
-        IO.println(member);
     }
 
     public void printCompetitions(Competition competition){

@@ -176,13 +176,9 @@ public class FileHandler {
     }
 
     public List<Competition> loadCompetitionsWithResults(String competitionsPath, String resultsPath) throws IOException {
-
         List<Competition> competitions = loadCompetitions(competitionsPath);
-
         List<CompetitionResult> competitionResults = loadCompetitionResults(resultsPath);
-
         connectCompetitionResults(competitions, competitionResults);
-
         return competitions;
     }
 }
