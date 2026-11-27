@@ -1,3 +1,5 @@
+package Membership;
+
 import User_And_Member.Member;
 import User_And_Member.MemberType;
 import User_And_Member.User;
@@ -69,7 +71,6 @@ public class MembershipFeeService {
     public boolean registerPayment(int memberNumber, int year) {
         for (MembershipPayment payment : payments) {
             if (payment.getMemberNumber() == memberNumber && payment.getYear() == year) {
-                payment.setPaid(true);
 
                 if (payment.isPaid()){
                     return false;
@@ -117,12 +118,22 @@ public class MembershipFeeService {
         return total;
     }
 
-    public void createPaymentsForAllMembers(List<User> users, int year) {
+    public int createPaymentsForAllMembers(List<User> users, int year) {
+        int createdPayments = 0;
+
         for (User user : users) {
             if (user instanceof Member member) {
+                int previousSize = payments.size();
+
                 createMembershipPayment(member, year);
+
+                if (payments.size() > previousSize) {
+                    createdPayments++;
+                }
             }
         }
+
+        return createdPayments;
     }
 
     public MembershipPayment getMembershipPayment(int memberNumber, int year){
@@ -137,5 +148,14 @@ public class MembershipFeeService {
     public boolean payMembershipFee(Member member, int year){
         createMembershipPayment(member,year);
         return registerPayment(member.getMemberNumber(),year);
+    }
+
+    public void loadMembershipPayments(List<MembershipPayment> loadedPayments) {
+        payments.clear();
+        payments.addAll(loadedPayments);
+    }
+
+    public List<MembershipPayment> getMembershipPayments() {
+        return new ArrayList<>(payments);
     }
 }

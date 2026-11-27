@@ -5,6 +5,7 @@ import Disciplines.Disciplines;
 import Disciplines.Result;
 import Disciplines.CompetitionResult;
 import User_And_Member.*;
+import Membership.MembershipPayment;
 
 import java.time.LocalDate;
 
@@ -127,4 +128,21 @@ public class CSVMapper {
         return competitionResult.competitionID() + delimiter
                 + toCSVResults(competitionResult.result());
     }
+
+    public MembershipPayment fromCSVMembershipPayment(String line) {
+        String[] token = line.split(delimiter);
+
+        int memberNumber = Integer.parseInt(token[0]);
+        int year = Integer.parseInt(token[1]);
+        int amount = Integer.parseInt(token[2]);
+        boolean paid = Boolean.parseBoolean(token[3]);
+
+        return new MembershipPayment(memberNumber, year, amount, paid);
+    }
+
+    public String toCSVMembershipPayment(MembershipPayment payment) {
+        return payment.getMemberNumber() + delimiter + payment.getYear() + delimiter + payment.getAmount() + delimiter + payment.isPaid();
+
+    }
 }
+

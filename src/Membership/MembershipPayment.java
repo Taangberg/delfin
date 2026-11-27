@@ -1,3 +1,5 @@
+package Membership;
+
 public class MembershipPayment {
     private int memberNumber;
     private int year;

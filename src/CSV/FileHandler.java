@@ -7,6 +7,7 @@ import User_And_Member.Administrator;
 import User_And_Member.Member;
 import User_And_Member.Trainer;
 import User_And_Member.Treasurer;
+import Membership.MembershipPayment;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -109,8 +110,11 @@ public class FileHandler {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (!line.isBlank()){
                 results.add(csvMapper.fromCSVResults(line));
             }
+
+        }
         }
         return results;
     }
@@ -181,4 +185,36 @@ public class FileHandler {
         connectCompetitionResults(competitions, competitionResults);
         return competitions;
     }
-}
+
+    public List<MembershipPayment> loadMembershipPayment(String filepath) throws IOException{
+        List<MembershipPayment> payments = new ArrayList<>();
+        Path path = Path.of(filepath);
+
+        if(!Files.exists(path)){
+            return payments;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(filepath))){
+            String line;
+
+            while((line = reader.readLine()) != null){
+                if (!line.isBlank()){
+                    payments.add(csvMapper.fromCSVMembershipPayment(line));
+                }
+            }
+        }
+        return payments;
+    }
+
+    public void saveMembershipPayments(List<MembershipPayment> payments, String filePath) throws IOException{
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(filePath))) {
+            for (MembershipPayment payment : payments){
+                writer.write(csvMapper.toCSVMembershipPayment(payment));
+                writer.newLine();
+                }
+            }
+        }
+
+    }
+
+
+

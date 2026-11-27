@@ -1,5 +1,6 @@
 import Competition.Competition;
 import Disciplines.Disciplines;
+import Membership.MembershipPayment;
 import User_And_Member.*;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -123,14 +124,14 @@ public class ConsoleUI {
     public int treasurerInput() {
         IO.println("""
             --- Treasurer Menu ---
-            1. View expected income
+            1. View total expected income
             2. View paid income
             3. View unpaid income
             4. View members with unpaid membership
-            5. Register membership payment
-            6. Create payments for all members
-            7. View members with paid membership
-            8. Exit
+            5. view members with paid membership
+            6. Register membership payment
+            7. Create payments for all members
+            8. Go Back
             """);
 
         return Integer.parseInt(IO.readln("Input..."));
@@ -138,44 +139,47 @@ public class ConsoleUI {
 
     public void treasurerRun() {
         boolean running = true;
+
         while (running) {
             switch (treasurerInput()) {
                 case 1 -> IO.println(
-                        "Expected income: " + backend.calculateTotalExpectedIncome()
+                        "Expected income: " + backend.calculateTotalExpectedIncome() + " kr."
                 );
                 case 2 -> {
-                    int year = Integer.parseInt(IO.readln("Input year: "));
-                    IO.println("Paid income: " + backend.calculateTotalPaidIncome(year));
+                    int year = inputYear();
+                    IO.println("Paid income: " + backend.calculateTotalPaidIncome(year) + " kr.");
                 }
                 case 3 -> {
-                    int year = Integer.parseInt(IO.readln("Input year: "));
-                    IO.println("Unpaid income: " + backend.calculateTotalUnpaidIncome(year));
+                    int year = inputYear();
+                    IO.println("Unpaid income: " + backend.calculateTotalUnpaidIncome(year) + " kr.");
                 }
                 case 4 -> {
-                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    int year = inputYear();
                     backend.printMembersWithUnpaidMembership(year);
                 }
                 case 5 -> {
-                    int memberNumber = Integer.parseInt(IO.readln("Input member number: "));
-                    int year = Integer.parseInt(IO.readln("Input year: "));
+                    int year = inputYear();
+                    backend.printMembersWithPaidMembership(year);
+                }
+                case 6 -> {
+                    int memberNumber = inputMemberNumber();
+                    int year = inputYear();
+
                     if (backend.registerMembershipPayment(memberNumber, year)) {
                         IO.println("Payment registered.");
                     } else {
-                        IO.println("Payment not found.");
+                        IO.println("No unpaid membership payment found for this member and year.");
                     }
                 }
-                case 6 -> {
-                    int year = Integer.parseInt(IO.readln("Input year: "));
-                    backend.createPaymentsForAllMembers(year);
-                    IO.println("Payments created.");
-                }
                 case 7 -> {
-                    int year = Integer.parseInt(IO.readln("Input year"));
-                    backend.printMembersWithPaidMembership(year);
+                    int year = inputYear();
+                    int created = backend.createPaymentsForAllMembers(year);
+                    IO.println(created + " payments created.");
                 }
                 case 8 -> running = false;
                 default -> IO.println("Invalid input.");
             }
+            IO.println();
         }
     }
 
@@ -183,9 +187,20 @@ public class ConsoleUI {
         IO.println(String.format("""
                 --- Hello %s ---
                 1. View Results
-                2. Pay Fee
+                2. Membership
                 3. Go back
                 """, member.getName()));
+        return Integer.parseInt(IO.readln("Input... "));
+    }
+
+    public int membershipMenu() {
+        IO.println("""
+            --- Membership ---
+            1. Pay Membership Fee
+            2. View Membership Receipt
+            3. Go back
+            """);
+
         return Integer.parseInt(IO.readln("Input... "));
     }
 
@@ -202,7 +217,28 @@ public class ConsoleUI {
                     IO.println(backend.viewMembertimes(choice, chooseDisciplines(), member));
 
                 }
-                case 2 -> payMembershipFee(member);
+                case 2 -> {
+                    boolean membershipRunning = true;
+
+                    while (membershipRunning) {
+                        switch (membershipMenu()) {
+                            case 1 -> payMembershipFee(member);
+                            case 2 -> {
+                                int year = LocalDate.now().getYear();
+                                MembershipPayment payment =
+                                        backend.getMembershipPayment(member.getMemberNumber(), year);
+
+                                if (payment != null && payment.isPaid()) {
+                                    printMembershipReceipt(member, year);
+                                } else {
+                                    IO.println("No paid membership found for the current year.");
+                                }
+                            }
+                            case 3 -> membershipRunning = false;
+                            default -> IO.println("Invalid input.");
+                        }
+                    }
+                }
                 case 3 -> running = false;
                 default -> IO.println("Give the right input...");
             }
@@ -402,6 +438,40 @@ public class ConsoleUI {
             }
         } else {
             IO.println("Payment cancelled.");
+        }
+    }
+
+    private int inputYear() {
+        while (true) {
+            try {
+                int year = Integer.parseInt(IO.readln("Input year: "));
+
+                if (year > 0) {
+                    return year;
+                }
+
+                IO.println("Year must be greater than 0.");
+            } catch (NumberFormatException e) {
+                IO.println("Invalid input. Please enter a valid year.");
+            }
+        }
+    }
+
+    private int inputMemberNumber() {
+        while (true) {
+            try {
+                int memberNumber = Integer.parseInt(
+                        IO.readln("Input member number: ")
+                );
+
+                if (memberNumber > 0) {
+                    return memberNumber;
+                }
+
+                IO.println("Member number must be greater than 0.");
+            } catch (NumberFormatException e) {
+                IO.println("Invalid input. Please enter a valid member number.");
+            }
         }
     }
 

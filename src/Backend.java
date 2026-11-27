@@ -2,7 +2,10 @@ import Competition.*;
 import Disciplines.*;
 import CSV.CSVMapper;
 import CSV.FileHandler;
+import Membership.MembershipFeeService;
+import Membership.MembershipPayment;
 import User_And_Member.*;
+import Membership.MembershipPayment;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -25,6 +28,7 @@ public class Backend {
         loadUsers();
         loadTrainingResults();
         loadCompetitions();
+        loadMembershipPayments();
     }
 
     public void setUI(ConsoleUI newUi) {
@@ -360,8 +364,8 @@ public class Backend {
         return membershipFeeService.calculateTotalExpectedIncome(users);
     }
 
-    public void createPaymentsForAllMembers(int year) {
-        membershipFeeService.createPaymentsForAllMembers(users, year);
+    public int createPaymentsForAllMembers(int year) {
+        return membershipFeeService.createPaymentsForAllMembers(users, year);
     }
 
     public int calculateTotalPaidIncome(int year) {
@@ -371,17 +375,6 @@ public class Backend {
     public int calculateTotalUnpaidIncome(int year) {
         return membershipFeeService.calculateTotalUnpaidIncome(year);
     }
-
-    /* Funktion længere ned gør det samme, men det her kan måske bruges andet sted.(ikke slet endnu)
-    public List<MembershipPayment> getUnpaidPayments(int year) {
-        return membershipFeeService.getUnpaidPayments(year);
-    }
-
-    public List<MembershipPayment> getPaidPayments(int year) {
-        return membershipFeeService.getPaidPayments(year);
-    }
-
-     */
 
     public boolean registerMembershipPayment(int memberNumber, int year) {
         return membershipFeeService.registerPayment(memberNumber, year);
@@ -394,9 +387,9 @@ public class Backend {
             Member member = printMember(payment.getMemberNumber());
 
             if (member != null) {
-                printMember(payment.getMemberNumber());
+                IO.println(member);
                 IO.println("Payment year: " + payment.getYear());
-                IO.println("Amount: " + payment.getAmount());
+                IO.println("Amount: " + payment.getAmount() + " kr.");
                 IO.println("Status: Unpaid");
                 IO.println("--------------------");
             }
@@ -410,9 +403,9 @@ public class Backend {
             Member member = printMember(payment.getMemberNumber());
 
             if (member != null) {
-                printMember(payment.getMemberNumber());
+                IO.println(member);
                 IO.println("Payment year: " + payment.getYear());
-                IO.println("Amount: " + payment.getAmount());
+                IO.println("Amount: " + payment.getAmount() + " kr.");
                 IO.println("Status: Paid");
                 IO.println("--------------------");
             }
@@ -560,6 +553,8 @@ public class Backend {
         saveCompetitions();
         saveTrainingResults(trainingResults);
         saveCompetitionResults(getAllCompetitionResults());
+        saveMembershipPayments();
+
     }
 
     public void loadUsers() throws IOException {
@@ -603,6 +598,14 @@ public class Backend {
                 competitions.add(senior);
             }
         }
+    }
+    public void loadMembershipPayments() throws IOException {
+        List<MembershipPayment> payments = fileHandler.loadMembershipPayment("src/CSV/MembershipPayments.CSV");
+        membershipFeeService.loadMembershipPayments(payments);
+    }
+
+    public void saveMembershipPayments() throws IOException {
+        fileHandler.saveMembershipPayments(membershipFeeService.getMembershipPayments(), "src/CSV/MembershipPayments.CSV");
     }
 }
 
