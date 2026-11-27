@@ -3,10 +3,12 @@ package User_And_Member;
 public class User {
     String email;
     String password;
+    LockedPassword passwordStatus;
 
-    public User(String email, String password){
+    public User(String email, String password, LockedPassword passwordStatus){
         this.email = email;
         this.password = password;
+        this.passwordStatus = passwordStatus;
     }
 
     public String getEmail(){
@@ -14,6 +16,13 @@ public class User {
     }
     public String getPassword(){
         return password;
+    }
+    public void setPasswordStatus(LockedPassword newpasswordStatus){
+        passwordStatus = newpasswordStatus;
+    }
+
+    public LockedPassword getPasswordStatus() {
+        return passwordStatus;
     }
 
     public String toString(){

@@ -10,10 +10,10 @@ public class Member extends User {
     int memberNumber;
     MemberType memberType;
 
-    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, MemberType memberType) {
+    public Member(String name, String lastName, String email, String password, LocalDate birthday, int memberNumber, MemberType memberType, LockedPassword passwordStatus) {
         this.name = name;
         this.lastName = lastName;
-        super(email, password);
+        super(email, password, passwordStatus);
         this.birthday = birthday;
         this.memberNumber = memberNumber;
         this.memberType = memberType;
@@ -41,6 +41,18 @@ public class Member extends User {
 
     public void setEmail(String newEmail) {
         email = newEmail;
+    }
+
+    public void setPassword(String newPassword){
+        password = newPassword;
+    }
+
+    public void setPasswordStatus(LockedPassword newpasswordStatus){
+        passwordStatus = newpasswordStatus;
+    }
+
+    public LockedPassword getPasswordStatus() {
+        return passwordStatus;
     }
 
     public LocalDate getBirthday() {

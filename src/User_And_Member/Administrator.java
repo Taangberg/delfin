@@ -6,12 +6,12 @@ import java.util.Random;
 
 public class Administrator extends User {
 
-    public Administrator(String email, String password) {
-        super(email, password);
+    public Administrator(String email, String password, LockedPassword passwordStatus) {
+        super(email, password, passwordStatus);
     }
 
     // Create skal have connection til backend hvilket tilføjer til arrayList og backend har forbindelse til UI, hvilket admin kan skrive i.
-    public Member createNewMember(List<Member> members, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) {
+    public Member createNewMember(List<Member> members, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType, LockedPassword passwordStatus) {
         Random random = new Random();
         int memberNumber = 0;
         boolean running = true;
@@ -29,6 +29,6 @@ public class Administrator extends User {
                 }
             }
         }
-        return new Member(firstName, lastName, email, password, birthday, memberNumber, memberType);
+        return new Member(firstName, lastName, email, password, birthday, memberNumber, memberType, passwordStatus);
     }
 }

@@ -34,31 +34,60 @@ public class Backend {
         ui = newUi;
     }
 
-    public void login(String email, String password) throws IOException {
+    public String login(String email, String password) throws IOException {
         for (User user : users) {
             if (user instanceof Administrator) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.adminRun(email, password);
+                if (user.getEmail().equalsIgnoreCase(email)) {
+                    if(user.getPassword().equalsIgnoreCase(password) && isPasswordLocked(user)) {
+                        ui.adminRun(email, password);
+                        return "Lykkedes";
+                    } else  if (user.getPassword().equalsIgnoreCase(password) && isPasswordLocked(user)){
+                        return "LOCKED";
+                    } else {
+                        return "WRONGPASSWORD";
+                    }
                 }
             } else if (user instanceof Trainer) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.trainerRun(email, password);
+                if (user.getEmail().equalsIgnoreCase(email)) {
+                    if(user.getPassword().equalsIgnoreCase(password)) {
+                        ui.trainerRun(email, password);
+                        return "Lykkedes";
+                    } else  if (user.getPassword().equalsIgnoreCase(password) && isPasswordLocked(user)){
+                        return "LOCKED";
+                    } else {
+                        return "WRONGPASSWORD";
+                    }
                 }
             } else if (user instanceof Treasurer) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.treasurerRun();
+                if (user.getEmail().equalsIgnoreCase(email)) {
+                    if(user.getPassword().equalsIgnoreCase(password)) {
+                        ui.treasurerRun();
+                        return "Lykkedes";
+                    } else  if (user.getPassword().equals(password) && isPasswordLocked(user)){
+                        return "LOCKED";
+                    } else {
+                        return "WRONGPASSWORD";
+                    }
                 }
             } else if (user instanceof Member) {
-                if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equalsIgnoreCase(password)) {
-                    ui.memberRun((Member)user, email);
+                if (user.getEmail().equalsIgnoreCase(email)) {
+                    if(user.getPassword().equalsIgnoreCase(password)) {
+                        ui.memberRun((Member)user, email);
+                        return "Lykkedes";
+                    } else  if (user.getPassword().equalsIgnoreCase(password) && isPasswordLocked(user)){
+                        return "LOCKED";
+                    } else {
+                        return "WRONGPASSWORD";
+                    }
                 }
             }
         }
+        return "WRONGEMAIL";
     }
 
-    public void createMember(String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) throws IOException {
-        Administrator administrator = new Administrator(adminEmail, adminPassword);
-        Member member = administrator.createNewMember(members, firstName, lastName, email, password, birthday, memberType);
+    public void createMember(User user, String adminEmail, String adminPassword, String firstName, String lastName, String email, String password, LocalDate birthday, MemberType memberType) throws IOException {
+        Administrator administrator = new Administrator(adminEmail, adminPassword, user.getPasswordStatus());
+        Member member = administrator.createNewMember(members, firstName, lastName, email, password, birthday, memberType, user.getPasswordStatus());
         members.add(member);
         users.add(member);
         fileHandler.saveMembers(members, filePath);
@@ -80,6 +109,8 @@ public class Backend {
                         return;
                     }
                     member.setMemberType(newType);
+                } else if (editChoice == EditMember.PASSWORD) {
+                    member.setPassword(ui.password());
                 }
             }
         }
@@ -227,20 +258,20 @@ public class Backend {
         return null;
     }
 
-    public void createResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
-        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+    public void createResult(User user, String trainerEmail, String trainerPassword, Disciplines disciplines, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword, user.getPasswordStatus());
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         trainingResults.add(result);
     }
 
-    public void createCompetition(String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date) {
-        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+    public void createCompetition(User user, String trainerEmail, String trainerPassword, String arrangement, String location, LocalDate date) {
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword, user.getPasswordStatus());
         Competition competition = trainer.createCompetition(competitions, arrangement, location, date);
         competitions.add(competition);
     }
 
-    public void createCompResult(String trainerEmail, String trainerPassword, Disciplines disciplines, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
-        Trainer trainer = new Trainer(trainerEmail, trainerPassword);
+    public void createCompResult(User user, String trainerEmail, String trainerPassword, Disciplines disciplines, int competitionID, int resultHour, int resultMinute, int resultSecond, LocalDate resultDate, int memberNumber){
+        Trainer trainer = new Trainer(trainerEmail, trainerPassword, user.getPasswordStatus());
         Result result = trainer.createResult(disciplines, resultHour, resultMinute, resultSecond, resultDate, memberNumber);
         for(Competition competition : competitions){
             if(competition.getCompetitionID() == competitionID) {
@@ -432,6 +463,14 @@ public class Backend {
     }
     public MembershipPayment getMembershipPayment(int memberNumber, int year){
         return membershipFeeService.getMembershipPayment(memberNumber, year);
+    }
+
+    public Boolean isPasswordLocked(User user){
+        return user.getPasswordStatus() == LockedPassword.LOCKED_PASSWORD;
+    }
+
+    public void lockPassword(User user){
+        user.setPasswordStatus(LockedPassword.LOCKED_PASSWORD);
     }
 
     public boolean isJuniorResult(Result result) {

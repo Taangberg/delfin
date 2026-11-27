@@ -34,10 +34,27 @@ public class ConsoleUI {
     }
 
     public void login() throws IOException {
+        boolean running = true;
         IO.println("--- Login Page ---");
-        String email = IO.readln("Input Email: ");
-        String password = IO.readln("Input Password: ");
-        backend.login(email, password);
+        while(running) {
+            String email = IO.readln("Input Email: ");
+            String password = IO.readln("Input Password: ");
+            switch (backend.login(email, password)){
+                case "SUCCESS" -> {
+                    IO.println("Vellykket login!");
+                }
+                case "LOCKED" -> {
+                    IO.println("Your password has been locked");
+                }
+                case "WRONGPASSWORD" -> {
+                    IO.println("Wrong password");
+                }
+                case "WRONGEMAIL" -> {
+                    IO.println("Information inputtet is wrong");
+                }
+            }
+
+        }
     }
 
     public int adminInput() {

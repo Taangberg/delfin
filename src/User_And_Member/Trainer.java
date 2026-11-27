@@ -7,8 +7,8 @@ import java.util.Random;
 
 public class Trainer extends User {
 
-    public Trainer(String email, String password){
-        super(email, password);
+    public Trainer(String email, String password,LockedPassword passwordStatus){
+        super(email, password, passwordStatus);
     }
 
     public void changeCompetitorStatus(Member member, Boolean choice){
